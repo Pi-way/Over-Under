@@ -21,7 +21,18 @@ void autonomous(void) {
 
 }
 
+
+
 void usercontrol(void) {
+  
+  while(1)
+  {
+    Brain.Screen.clearLine(1);
+    Brain.Screen.setCursor(1,1);
+    Brain.Screen.print(enncoder.angle(deg));
+
+    wait(20, msec);
+  }
 
 }
 

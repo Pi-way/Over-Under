@@ -1,3 +1,5 @@
+#pragma once
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +8,9 @@
 #include "v5.h"
 #include "v5_vcs.h"
 
+#include "Robot/tracking_wheel.h"
+#include "Robot/odometry.h"
+#include "Robot/robot.h"
 
 #define waitUntil(condition)                                                   \
   do {                                                                         \
