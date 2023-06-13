@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
 
 #include "v5.h"
 #include "v5_vcs.h"
 
+#include "util.h"
 #include "Robot/tracking_wheel.h"
 #include "Robot/odometry.h"
 #include "Robot/robot.h"

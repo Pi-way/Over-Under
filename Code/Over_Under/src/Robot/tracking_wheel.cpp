@@ -1,12 +1,13 @@
 #include "vex.h"
 using namespace vex;
 
-TrackingWheel::TrackingWheel(rotation _encoder, double _radius){
+TrackingWheel::TrackingWheel(rotation _encoder, double _diameter, bool _reverse){
 
     // Initialize member vairables
 
     encoder = _encoder;
-    radius = _radius;
+    diameter = _diameter;
+    reverse = _reverse;
 
     // Reset the encoder
 
@@ -17,10 +18,13 @@ double TrackingWheel::get_travel(){
 
     // Get the change in angle of the encoder
 
-    double theta = encoder.angle(deg);
+    previous_angle = current_angle;
+    current_angle = encoder.position(deg) * ((reverse) ? -1.0 : 1.0);
+
+    double theta = current_angle - previous_angle;
 
     // Use the radius of the weel to determine how many inches were traveled
 
-    return (theta / 180.0) * radius;
+    return (theta / 360) * diameter * PI;
 
 }
