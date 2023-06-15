@@ -1,7 +1,12 @@
 #include "vex.h"
 using namespace vex;
 
-controller Controller;
-brain Brain;
+Robot::Robot() {
+    
+}
 
-rotation enncoder = rotation(PORT5);
+competition Competition;
+brain Brain;
+controller Controller;
+Robot robot;
+Odometry odom;
