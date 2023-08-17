@@ -11,26 +11,15 @@
 
 using namespace vex;
 
-void pre_auton(void) {
-
-}
-
-void autonomous(void) {
-
-}
-
-void usercontrol(void) {
-
-}
-
 int main() {
-
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
+  Brain.Screen.setFont(vex::fontType::prop20);
+  
   pre_auton();
-
+  
   while (true) {
-    wait(100, msec);
+    wait(20, msec);
   }
 }

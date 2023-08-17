@@ -51,3 +51,4 @@ uint8_t* copyStringStreamToHeap(std::stringstream& ss) {
 
   return ptr;
 }
+
