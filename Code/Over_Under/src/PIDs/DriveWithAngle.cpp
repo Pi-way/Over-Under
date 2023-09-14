@@ -13,7 +13,7 @@ int _Drive_With_Angle_()
 {
   double CorrectionCoeficient = 1;
     // Assign and declare local variables from global variables.
-  double LocalDistance = ((Distance/(2.85*3.1415))*(1))*360.0;
+  double LocalDistance = ((Distance/(2.75*3.1415))*(1))*360.0;
   double LocalTurnDistance = TurnDistance;
   double LocalSpeed = Speed;
   bool LocalCoast = Coast;
@@ -30,7 +30,7 @@ int _Drive_With_Angle_()
 
   bool NotDone = true;
   
-  PID LocalPID(0.11, 0.05, 0.125, 125, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID(0.15, 0.05, 0.125, 100, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -45,6 +45,9 @@ int _Drive_With_Angle_()
 
   double ThisTime = Brain.Timer.systemHighResolution();
   double LastTime = ThisTime;
+  
+  RightDrive(spin(forward);)
+  LeftDrive(spin(forward);)
 
   while (NotDone)
   {

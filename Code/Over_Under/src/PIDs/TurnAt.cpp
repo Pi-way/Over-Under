@@ -39,6 +39,9 @@ int _Turn_At_()
 
   double ThisTime = Brain.Timer.systemHighResolution();
   double LastTime = ThisTime;
+
+  RightDrive(spin(forward);)
+  LeftDrive(spin(forward);)
   
   while (NotDone)
   {

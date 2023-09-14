@@ -122,7 +122,7 @@ public:
 	Button should_run_auto_button = Button(163, 163, 150, 71, "Don't Run");
 
 	std::pair<std::function<void()>, std::string> autos[2][3][4];
-	std::function<void()> *test_auton_ptr;
+	std::vector<int> test_auton;
 
 	bool selection_has_changed = false;
 	bool should_update = true;

@@ -12,7 +12,7 @@ int _Drive_With_Angles_()
 
   for(auto indicies = LocalList.begin(); indicies != LocalList.end(); indicies++ )
   {
-    LocalDistance += ( indicies->first / (2.85*3.1415) ) * 360.0;
+    LocalDistance += ( indicies->first / (2.75*3.1415) ) * 360.0;
   }
 
   int currentIndex = 0;
@@ -42,7 +42,7 @@ int _Drive_With_Angles_()
 
   double DrivePos = 0;
 
-  double SmallError = (( LocalList[currentIndex].first / (2.85*3.1415) ) * 360.0) - (Encoder.position(deg) - DrivePos);
+  double SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (Encoder.position(deg) - DrivePos);
 
   //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
   double Error = LocalDistance - Encoder.position(deg);
@@ -64,6 +64,8 @@ int _Drive_With_Angles_()
 
   double DeltaTime = 0;
 
+  RightDrive(spin(forward);)
+  LeftDrive(spin(forward);)
 
   //main loop
   while (NotDone)

@@ -378,8 +378,10 @@ void MatchSelector::RunAutonomous()
 {   
     should_update = false;
 
+
+
     //If the match selector is being used, and no auton is selected (or no auton should be ran)
-    if (run_nothing && (Competition.isCompetitionSwitch() || Competition.isFieldControl())) {
+    if (run_nothing && (Competition.isFieldControl())) {
         Brain.Screen.clearScreen();
         Brain.Screen.setFillColor("#000000");
         Brain.Screen.setFont(vex::fontType::mono60);
@@ -388,6 +390,7 @@ void MatchSelector::RunAutonomous()
         return;
     }
 
+
     //If the match selector is being used, and an auton was selected
     if (!run_nothing) {
         CurrentSelection().first();
@@ -395,8 +398,9 @@ void MatchSelector::RunAutonomous()
         return;
     }
 
+
     //If neither above scenario was true, run the test auton
-   (*test_auton_ptr)();
+   autos[test_auton[0]][test_auton[1]][test_auton[2]].first();
 }
 void MatchSelector::SetTestAutonomous(const char* a, const char* s, const char* t)
 {
@@ -416,5 +420,8 @@ void MatchSelector::SetTestAutonomous(const char* a, const char* s, const char* 
     else if (t == "Half Winpoint")	{ty = 2;}
     else if (t == "Winpoint")		{ty = 3;}
 
-    test_auton_ptr = &autos[al][si][ty].first;
+    test_auton.push_back(al);
+    test_auton.push_back(si);
+    test_auton.push_back(ty);
+
 }

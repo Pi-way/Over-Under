@@ -1,24 +1,36 @@
 #pragma once
 using namespace vex;
+#include "Auton/PID.h"
 
 class Robot{
+private:
+  
+  float cata_first_pre_load_angle = -10; //Deg
+  float cata_first_pre_launch_angle = 95;
+
+  float cata_second_pre_load_angle = 170; //Deg
+  float cata_second_pre_launch_angle = 275;
+
+  bool not_done = true;
+
+  PID catapult_PID = PID(0, 0, 0, 0, 0, 10, &not_done, 0, 0); //Changing this does nothing, change in Robot::LaunchCatapult()
+
 public:
 
-    Robot();
+  Robot();
 
-    // motor FR = motor(PORT7, ratio18_1, false);
-    // motor BR = motor(PORT10, ratio18_1, false);
-    // motor BL = motor(PORT1, ratio18_1, true);
-    // motor FL = motor(PORT2, ratio18_1, true);
+  void LaunchCatapult();
 
-    motor FR = motor(PORT1, ratio6_1, true);
-    motor FL = motor(PORT10, ratio6_1, false);
+  motor FR = motor(PORT1, ratio6_1, false);
+  motor FL = motor(PORT4, ratio6_1, true);
 
-    motor BR = motor(PORT7, ratio6_1, true);
-    motor BL = motor(PORT9, ratio6_1, false);
+  motor BR = motor(PORT2, ratio6_1, true);
+  motor BL = motor(PORT5, ratio6_1, false);
 
-    motor BBR = motor(PORT16, ratio18_1, true);
-    motor BBL = motor(PORT8, ratio18_1, false);
+  motor BBR = motor(PORT3, ratio6_1, false);
+  motor BBL = motor(PORT6, ratio6_1, true);
+
+  rotation catapult_rotation = rotation(PORT20);
 
 };
 
@@ -46,6 +58,7 @@ extern task msTask;
 
 extern rotation Encoder;
 extern inertial Inertial;
+extern motor Cata;
 
 typedef std::vector<std::pair<double, double >> distanceHeadingList;
 extern distanceHeadingList globalDistanceHeadingList;
@@ -81,6 +94,6 @@ void Turn(double amount, double speed = 100, bool wait_for_completion = true, bo
   * @param line Variable for Debugging & Logging
   */
 extern bool ggps;
-void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.25, bool gps = false);
+void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.25);
 void DriveWithAngle(double distance, double turn_target, double speed = 75, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.125);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.25);

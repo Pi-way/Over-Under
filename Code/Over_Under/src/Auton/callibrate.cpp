@@ -26,5 +26,9 @@ int Callibrate()
     robot.BBL.setBrake(coast);
     robot.BBR.setBrake(coast);
 
+    Cata.setBrake(hold);
+    Cata.spin(forward);
+    Cata.setVelocity(0, pct);
+
     return 0;
 };
