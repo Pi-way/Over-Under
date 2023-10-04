@@ -30,9 +30,9 @@
 //     y += strafe_travel;
 // }
 
-// void Odometry::Callibrate(double _x, double _y, double _h) {
+// void Odometry::Calibrate(double _x, double _y, double _h) {
 //     // Reset inertial sensor.
-//     inert.calibrate();
+//     inert.Calibrate();
 //     inert.setHeading(_h, deg);
 //     inert.setRotation(_h, deg);
 

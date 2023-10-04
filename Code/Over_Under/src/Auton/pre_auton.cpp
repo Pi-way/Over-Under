@@ -7,7 +7,7 @@ void pre_auton(void) {
 		"Match", "Right", "Half Winpoint",
 		new auton{
 			[](){
-				Inertial.setHeading(0, deg);
+				robot.Inertial.setHeading(0, deg);
 
 				DriveWithAngle(40, 0, 100, true, false, 1.75, 0);
 				DriveWithAngle(-40, 0, 75, true, false, 1.75, 0);
@@ -23,7 +23,8 @@ void pre_auton(void) {
 		"Skills", "Right", "Winpoint",
 		new auton{
 			[](){
-
+				robot.Cata.spin(forward);
+				robot.Cata.setVelocity(80, pct);
 			},
 			"This skills auto better work, or else I will quit my job. Oh wait, I already did. XD"
 		}

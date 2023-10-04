@@ -34,7 +34,7 @@ int _Turn_At_()
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
-  double Error = wrapAngleDeg(LocalDistance - Inertial.heading(degrees));
+  double Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
 
   double ThisTime = Brain.Timer.systemHighResolution();
@@ -54,7 +54,7 @@ int _Turn_At_()
 
     vex::task::yield();
 
-    Error = wrapAngleDeg(LocalDistance - Inertial.heading(degrees));
+    Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
 
   }
 

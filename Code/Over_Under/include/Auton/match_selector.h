@@ -118,7 +118,7 @@ public:
 	Button alliance_button = Button(5, 5, 150, 71, "Red");
 	Button side_button = Button(5, 84, 150, 71, "Left");
 	Button type_button = Button(5, 163, 150, 71, "Simple");
-	Button callibrate_button = Button(321, 163, 150, 71, "Callibrate");
+	Button Calibrate_button = Button(321, 163, 150, 71, "Calibrate");
 	Button should_run_auto_button = Button(163, 163, 150, 71, "Don't Run");
 
 	std::pair<std::function<void()>, std::string> autos[2][3][4];

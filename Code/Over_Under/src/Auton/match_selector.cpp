@@ -166,7 +166,7 @@ MatchSelector::MatchSelector()
     alliance_button.DrawReleased();
     side_button.DrawReleased();
     type_button.DrawReleased();
-    callibrate_button.DrawReleased();
+    Calibrate_button.DrawReleased();
 
     for(int a = 0; a < 2; a ++){
         for(int s = 0; s < 3; s++){
@@ -231,10 +231,10 @@ void MatchSelector::Update()
     bool t_pressed = type_button.Update();
     bool run_pressed = should_run_auto_button.Update();
 
-    bool callibrate_pressed = callibrate_button.Update();
-    if(callibrate_pressed)
+    bool Calibrate_pressed = Calibrate_button.Update();
+    if(Calibrate_pressed)
     {   
-        msTask = vex::task(Callibrate);
+        msTask = vex::task(Calibrate);
         StartCountdown();
 
         alliance_button.DrawReleased();
@@ -278,7 +278,7 @@ void MatchSelector::Update()
     alliance_button.Update();
     side_button.Update();
     type_button.Update();
-    callibrate_button.Update();
+    Calibrate_button.Update();
     should_run_auto_button.Update();
 
     if(selection_has_changed)

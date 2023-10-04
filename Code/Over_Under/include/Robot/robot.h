@@ -2,14 +2,12 @@
 using namespace vex;
 #include "Auton/PID.h"
 
+extern competition Competition;
+extern brain Brain;
+extern controller Controller;
+
 class Robot{
 private:
-  
-  float cata_first_pre_load_angle = -10; //Deg
-  float cata_first_pre_launch_angle = 95;
-
-  float cata_second_pre_load_angle = 170; //Deg
-  float cata_second_pre_launch_angle = 275;
 
   bool not_done = true;
 
@@ -30,7 +28,19 @@ public:
   motor BBR = motor(PORT3, ratio6_1, false);
   motor BBL = motor(PORT6, ratio6_1, true);
 
-  rotation catapult_rotation = rotation(PORT20);
+  rotation catapult_rotation = rotation(PORT19);
+  motor Cata = motor(PORT9, ratio36_1, true);
+
+  rotation Encoder = rotation(PORT20, true);
+  inertial Inertial = inertial(PORT10);
+
+  motor LeftIntake = motor(PORT7, ratio18_1, false);
+  motor RightIntake = motor(PORT8, ratio18_1, true);
+
+  digital_out IntakeCylinder = digital_out(Brain.ThreeWirePort.A);
+  digital_out WingReleaseCylinder = digital_out(Brain.ThreeWirePort.B);
+  digital_out RightWingCylinder = digital_out(Brain.ThreeWirePort.C);
+  digital_out LeftWingCylinder = digital_out(Brain.ThreeWirePort.D);
 
 };
 
@@ -38,9 +48,6 @@ void usercontrol();
 void autonomous();
 void pre_auton();
 
-extern competition Competition;
-extern brain Brain;
-extern controller Controller;
 extern Robot robot;
 //extern Odometry odom;
 extern MatchSelector ms;
@@ -55,10 +62,6 @@ extern task msTask;
   robot.FL.MotorMember \
   robot.BL.MotorMember \
   robot.BBL.MotorMember
-
-extern rotation Encoder;
-extern inertial Inertial;
-extern motor Cata;
 
 typedef std::vector<std::pair<double, double >> distanceHeadingList;
 extern distanceHeadingList globalDistanceHeadingList;

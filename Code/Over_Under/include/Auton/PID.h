@@ -64,9 +64,6 @@ public:
     */ 
   double Update(double error, double dt);
 
-  /// @brief Enables data logging for the lifetime of the PID
-  /// @param data_file_prefix Prefix for this specific data log
-  void EnableDataLogging(const char* data_file_prefix);
 };
 
 /**

@@ -23,8 +23,6 @@ public:
     double h = 0;
 
     void Update();
-    void Callibrate(double _x = 0, double _y = 0, double _h = 0);
+    void Calibrate(double _x = 0, double _y = 0, double _h = 0);
     void SetPosition(double _x, double _y, double _h);
-
-    color c = blue;
 };

@@ -36,17 +36,17 @@ int _Drive_With_Angles_()
   
   PID LocalPID(0.11, 0.05, 0.125, 125, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
-  Encoder.setPosition(0, deg);
+  robot.Encoder.setPosition(0, deg);
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
   double DrivePos = 0;
 
-  double SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (Encoder.position(deg) - DrivePos);
+  double SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
 
   //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
-  double Error = LocalDistance - Encoder.position(deg);
-  double TurnError = wrapAngleDeg(localTurnDistance - Inertial.heading(degrees));
+  double Error = LocalDistance - robot.Encoder.position(deg);
+  double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
 
   //initialize time variables for calculating delta time
@@ -108,16 +108,16 @@ int _Drive_With_Angles_()
     vex::task::yield();
 
     //calculate horizontal and heading error
-    Error = LocalDistance - Encoder.position(degrees);
+    Error = LocalDistance - robot.Encoder.position(degrees);
 
-    SmallError = (( LocalList[currentIndex].first / (2.85*3.1415) ) * 360.0) - (Encoder.position(deg) - DrivePos);
-    TurnError = wrapAngleDeg(LocalList[currentIndex].second - Inertial.heading(degrees));
+    SmallError = (( LocalList[currentIndex].first / (2.85*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
+    TurnError = wrapAngleDeg(LocalList[currentIndex].second - robot.Inertial.heading(degrees));
 
     if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
     {
       if(currentIndex + 1 < LocalList.size()){
         currentIndex ++;
-        DrivePos = Encoder.position(deg);
+        DrivePos = robot.Encoder.position(deg);
       }
       else
       {

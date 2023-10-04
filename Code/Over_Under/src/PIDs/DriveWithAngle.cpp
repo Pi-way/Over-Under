@@ -38,9 +38,9 @@ int _Drive_With_Angle_()
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
-  Encoder.setPosition(0, deg);
-  double Error = LocalDistance - Encoder.position(deg);
-  double TurnError = wrapAngleDeg(LocalTurnDistance - Inertial.heading(degrees));
+  robot.Encoder.setPosition(0, deg);
+  double Error = LocalDistance - robot.Encoder.position(deg);
+  double TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
 
   double ThisTime = Brain.Timer.systemHighResolution();
@@ -59,8 +59,8 @@ int _Drive_With_Angle_()
     LeftDrive(setVelocity(OutputSpeed + TurnError * CorrectionCoeficient, pct);)
 
     vex::task::yield();
-    Error = LocalDistance - Encoder.position(deg);
-    TurnError = wrapAngleDeg(LocalTurnDistance - Inertial.heading(degrees));
+    Error = LocalDistance - robot.Encoder.position(deg);
+    TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
   }
 
   RightDrive(setVelocity(0, pct);)
