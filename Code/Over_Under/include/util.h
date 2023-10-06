@@ -12,3 +12,5 @@ double radToDeg(double radians);
 void rotatePoint(double& x, double& y, double angle);
 
 uint8_t* copyStringStreamToHeap(std::stringstream& ss);
+
+void clearConsole();

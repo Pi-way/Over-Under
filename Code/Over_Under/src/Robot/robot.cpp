@@ -37,6 +37,10 @@ void Robot::LaunchCatapult() {
         Cata_error = wrapAngleDeg(catapult_rotation.angle(deg));
         Cata_speed = catapult_PID.Update(Cata_error, delta_time);
 
+        if(Controller.ButtonL1.pressing()) {
+            Cata_speed = 75;
+        }
+
         Cata.setVelocity(Cata_speed, pct);
         wait(20, msec);
     }

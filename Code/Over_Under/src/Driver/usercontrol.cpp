@@ -14,7 +14,7 @@ double main_wing_open_delay = 0.75;
 bool right_wing_open = false;
 bool left_wing_open = false;
 
-void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false) {
+void ToggleRightWing(bool no_toggle, bool force_toggle_open) {
   // If nothing needs to be done
   if(no_toggle && (right_wing_open == force_toggle_open)){
     return;
@@ -46,7 +46,7 @@ void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false) {
   }
 }
 
-void ToggleLeftWing(bool no_toggle = false, bool force_toggle_open = false) {
+void ToggleLeftWing(bool no_toggle, bool force_toggle_open) {
   // If nothing needs to be done
   if(no_toggle && (left_wing_open == force_toggle_open)){
     return;

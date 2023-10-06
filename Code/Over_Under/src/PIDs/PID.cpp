@@ -35,8 +35,8 @@ double PID::Update(double error, double dt)
     Time += dt;
     PreviousError = Error;
     Error = error;
-    Integral += (error * I) * dt;
-    Derivative = Error - PreviousError;
+    Integral += error * dt;
+    Derivative = (Error - PreviousError) / dt;
 
 
     if(std::abs(Integral) * I > IntegralCap)

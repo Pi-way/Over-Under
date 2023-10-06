@@ -52,7 +52,7 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (true)
+  while (NotDone || TurnNotDone)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
@@ -60,16 +60,13 @@ int _Drive_With_Angle_()
     Error = LocalDistance - robot.Encoder.position(deg);
     TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
 
-    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000);
-    TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000);
+    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
+    TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000.0);
 
     RightDrive(setVelocity(OutputSpeed - TurnCorrectionSpeed, pct);)
     LeftDrive(setVelocity(OutputSpeed + TurnCorrectionSpeed, pct);)
 
     wait(20, msec);
-
-    printf("\x1B[2J\x1B[H");
-    printf("%f\n", Error);
   }
 
   RightDrive(setVelocity(0, pct);)

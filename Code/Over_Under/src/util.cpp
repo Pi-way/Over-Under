@@ -52,3 +52,6 @@ uint8_t* copyStringStreamToHeap(std::stringstream& ss) {
   return ptr;
 }
 
+void clearConsole() {
+    printf("\x1B[2J\x1B[H");
+}

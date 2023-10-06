@@ -33,8 +33,10 @@ int _Drive_With_Angles_()
   }
 
   bool NotDone = true;
+  bool TurnNotDone = true;
   
-  PID LocalPID(0.11, 0.05, 0.125, 125, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID((0.375) * 0.5, 0.01, 0.07, 175, 25, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &TurnNotDone, 2, 0.25);
 
   robot.Encoder.setPosition(0, deg);
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -48,16 +50,11 @@ int _Drive_With_Angles_()
   double Error = LocalDistance - robot.Encoder.position(deg);
   double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
+  double TurnOutputSpeed = 0;
 
   //initialize time variables for calculating delta time
   double ThisTime = Brain.Timer.time(seconds);
   double LastTime = ThisTime;
-
-  double OutputRight = 0;
-  double OutputLeft = 0;
-
-  double ActualAccel = 0;
-  double MaxAccel = 400;
 
   double RequestedRight = 0;
   double RequestedLeft = 0;
@@ -68,56 +65,44 @@ int _Drive_With_Angles_()
   LeftDrive(spin(forward);)
 
   //main loop
-  while (NotDone)
+  while (NotDone || TurnNotDone)
   {
     //record current time for delta time calculation
     LastTime = ThisTime;
-    ThisTime = Brain.Timer.time(seconds);
+    ThisTime = Brain.Timer.systemHighResolution();
 
-    DeltaTime = ThisTime - LastTime;
+    DeltaTime = (ThisTime - LastTime)/1000000.0;
 
-    //recieve the output speed of the PID object after giving it our error and delta time (in seconds)
+    //receive the output speed of the PID object after giving it our error and delta time (in seconds)
     OutputSpeed = LocalPID.Update(Error, DeltaTime);
+    TurnOutputSpeed = LocalTurnPID.Update(TurnError, DeltaTime);
 
-    //set each motor's speed to the sum of the PID speed and turn error multiplied by its coeficient
+    RequestedRight = (OutputSpeed - TurnOutputSpeed);
+    RequestedLeft = (OutputSpeed + TurnOutputSpeed);
 
-    RequestedRight = (OutputSpeed - (TurnError * TurnCorrection)) / (std::abs(TurnError/30.0) + 1.0);
-    RequestedLeft = (OutputSpeed + (TurnError * TurnCorrection)) / (std::abs(TurnError/30.0) + 1.0);
+    RightDrive(setVelocity(RequestedRight, pct);)
+    LeftDrive(setVelocity(RequestedLeft, pct);)
 
-    ActualAccel = (RequestedRight - OutputRight) / DeltaTime;
-    if (std::abs(ActualAccel) > MaxAccel){
-      OutputRight += MaxAccel * DeltaTime * GetSign(ActualAccel);
-    }
-    else
-    {
-      OutputRight = RequestedRight;
-    }
-
-    ActualAccel = (RequestedLeft - OutputLeft) / DeltaTime;
-    if (std::abs(ActualAccel) > MaxAccel){
-      OutputLeft += MaxAccel * DeltaTime *  GetSign(ActualAccel);
-    }
-    else
-    {
-      OutputLeft = RequestedLeft;
-    }
-
-    RightDrive(setVelocity(OutputRight, pct);)
-    LeftDrive(setVelocity(OutputLeft, pct);)
-
-    vex::task::yield();
+    wait(20, msec);
 
     //calculate horizontal and heading error
     Error = LocalDistance - robot.Encoder.position(degrees);
 
-    SmallError = (( LocalList[currentIndex].first / (2.85*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
+    SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
     TurnError = wrapAngleDeg(LocalList[currentIndex].second - robot.Inertial.heading(degrees));
+
+    clearConsole();
+    printf("%f", TurnError);
 
     if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
     {
       if(currentIndex + 1 < LocalList.size()){
         currentIndex ++;
         DrivePos = robot.Encoder.position(deg);
+        TurnNotDone = true;
+        LocalTurnPID.HasReachedEnd = false;
+        LocalTurnPID.Time = 0;
+        LocalTurnPID.TimeReachedEnd = 0;
       }
       else
       {

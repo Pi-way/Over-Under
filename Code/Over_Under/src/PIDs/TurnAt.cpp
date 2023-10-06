@@ -9,6 +9,8 @@
 
 #include <vex.h>
 
+double printer = 0;
+
 int _Turn_At_()
 {
     // Assign and declare local variables from global variables.
@@ -29,7 +31,7 @@ int _Turn_At_()
 
   bool NotDone = true;
   
-  PID LocalPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID((1.7675)*0.45, 0.0005, 0.03, 200, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -42,20 +44,29 @@ int _Turn_At_()
 
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
+
+  task printing_task = task([]()->int{
+    while(true){
+      wait(100, msec);
+      printf("\n");
+      printf("\033[31m %3.3f", (float)printer);
+    }
+    return 0;
+  });
   
-  while (NotDone)
+  while (true)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
-    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000);
+    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
 
     RightDrive(setVelocity(-OutputSpeed, pct);)
     LeftDrive(setVelocity(OutputSpeed, pct);)
 
-    wait(20, msec);
+    wait(50, msec);
+    printer = LocalPID.Error;
 
     Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
-
 
   }
 

@@ -76,27 +76,10 @@ extern double TurnDistance;
 extern vex::task PIDTask;
 
 
-/** 
-  * @brief This function allows the robot to turn using a PID.
-  * @param amount How far you want the robot to turn in degrees.
-  * @param speed The maximum speed for the robot to turn at (in percent).
-  * @param wait_for_completion Should the function execute normally (true), or in a task (false)?
-  * @param coast This sets the motors stopping to coast if true.
-  * @param coustom_timeout Maximum runtime of the function.
-  * @param line Variable for Debugging & Logging
-  */
+void ToggleBothWings();
+void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false);
+void ToggleLeftWing(bool no_toggle = false, bool force_toggle_open = false);
 void Turn(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.125);
-
-/** 
-  * @brief This function allows the robot to turn using a PID.
-  * @param amount Target absolute heading.
-  * @param speed The maximum speed for the robot to turn at (in percent).
-  * @param wait_for_completion Should the function execute normally (true), or in a task (false)?
-  * @param coast This sets the motors stopping to coast if true.
-  * @param coustom_timeout Maximum runtime of the function.
-  * @param line Variable for Debugging & Logging
-  */
-extern bool ggps;
 void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.125);
 void DriveWithAngle(double distance, double turn_target, double speed = 75, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.125);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);

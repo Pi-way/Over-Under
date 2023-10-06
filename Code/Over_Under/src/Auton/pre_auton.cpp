@@ -23,7 +23,13 @@ void pre_auton(void) {
 		"Skills", "Right", "Winpoint",
 		new auton{
 			[](){
-				DriveWithAngle(12, 0);
+				TurnAt(45);
+				// robot.IntakeCylinder.set(true);
+				// wait(0.5, sec);
+				// robot.LaunchCatapult();
+				// DriveWithAngles({{56, -3.5},{20, -90},{28, -180},{26.5, -90},{12,0}});
+				// printf("hey");
+				// ToggleBothWings();
 			},
 			"This skills auto better work, or else I will quit my job. Oh wait, I already did. XD"
 		}
