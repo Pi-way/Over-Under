@@ -31,6 +31,7 @@ public:
   double D;
   double R;
 
+  double IntegralProximity;
   double IntegralCap;
   double SpeedCap;
 
@@ -54,7 +55,7 @@ public:
   bool RanOnce = false;
   bool *NotDone;
 
-  PID(double p, double i, double d, double r, double integral_cap, double speed_cap, bool *not_done, double timeout, double settle_time);
+  PID(double p, double i, double d, double r, double integral_cap, double integral_proximity, double speed_cap, bool *not_done, double timeout, double settle_time);
     
   /**
     * @brief Updates the PID and related tasks.

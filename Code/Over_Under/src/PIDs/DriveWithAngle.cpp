@@ -9,6 +9,8 @@
 
 #include "vex.h"
 
+double gooderprinter = 0;
+
 int _Drive_With_Angle_()
 {
   double CorrectionCoeficient = 1;
@@ -31,8 +33,8 @@ int _Drive_With_Angle_()
   bool NotDone = true;
   bool TurnNotDone = true;
   
-  PID LocalPID((0.375) * 0.5, 0.01, 0.07, 175, 25, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &TurnNotDone, 1000000000, 1000000000);
+  PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID((1.7675)*0.45, 0.0005, 0.029, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 1000000000);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -52,7 +54,16 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (NotDone || TurnNotDone)
+  task printing_task = task([]()->int{
+    while(true){
+      wait(100, msec);
+      printf("\n");
+      printf("\033[31m %3.3f", (float)gooderprinter);
+    }
+    return 0;
+  });
+
+  while (NotDone)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
@@ -67,6 +78,7 @@ int _Drive_With_Angle_()
     LeftDrive(setVelocity(OutputSpeed + TurnCorrectionSpeed, pct);)
 
     wait(20, msec);
+    gooderprinter = Error;
   }
 
   RightDrive(setVelocity(0, pct);)

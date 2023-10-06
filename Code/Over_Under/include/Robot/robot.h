@@ -11,7 +11,7 @@ private:
 
   bool not_done = true;
 
-  PID catapult_PID = PID(0, 0, 0, 0, 0, 10, &not_done, 0, 0); //Changing this does nothing, change in Robot::LaunchCatapult()
+  PID catapult_PID = PID(0, 0, 0, 0, 0, 10, 360, &not_done, 0, 0); //Changing this does nothing, change in Robot::LaunchCatapult()
 
 public:
 
@@ -79,7 +79,6 @@ extern vex::task PIDTask;
 void ToggleBothWings();
 void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false);
 void ToggleLeftWing(bool no_toggle = false, bool force_toggle_open = false);
-void Turn(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.125);
-void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.125);
-void DriveWithAngle(double distance, double turn_target, double speed = 75, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.125);
+void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
+void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);

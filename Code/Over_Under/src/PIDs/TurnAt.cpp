@@ -31,7 +31,7 @@ int _Turn_At_()
 
   bool NotDone = true;
   
-  PID LocalPID((1.7675)*0.45, 0.0005, 0.03, 200, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID((1.7675)*0.45, 0.0005, 0.0225, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -54,7 +54,7 @@ int _Turn_At_()
     return 0;
   });
   
-  while (true)
+  while (NotDone)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();

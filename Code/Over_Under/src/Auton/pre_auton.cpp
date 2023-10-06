@@ -8,11 +8,10 @@ void pre_auton(void) {
 		new auton{
 			[](){
 				robot.Inertial.setHeading(0, deg);
-
-				DriveWithAngle(40, 0, 100, true, false, 1.75, 0);
-				DriveWithAngle(-40, 0, 75, true, false, 1.75, 0);
-				// TurnAt(63, 100, true, false, 2, 0);
-				// DriveWithAngle(-37, 63);
+				robot.Inertial.setHeading(45, deg);
+				robot.IntakeCylinder.set(true);
+				DriveWithAngles({{20, 65},{30, 180}});
+				DriveWithAngle(20, 180, 100, true, false, 1.0);
 
 			},
 			"Scores 1 alliance tri-ball, and touches barrier / elevation-bar"
@@ -23,11 +22,9 @@ void pre_auton(void) {
 		"Skills", "Right", "Winpoint",
 		new auton{
 			[](){
-				TurnAt(45);
-				// robot.IntakeCylinder.set(true);
-				// wait(0.5, sec);
-				// robot.LaunchCatapult();
-				// DriveWithAngles({{56, -3.5},{20, -90},{28, -180},{26.5, -90},{12,0}});
+				robot.Inertial.setHeading(0, deg);
+				DriveWithAngles({{55, -17},{15, -90},{30, -180},{30, -90},{12,0}});
+				//DriveWithAngle(65, 0);
 				// printf("hey");
 				// ToggleBothWings();
 			},
@@ -35,7 +32,7 @@ void pre_auton(void) {
 		}
 	);
 
-	ms.SetTestAutonomous("Skills", "Right", "Winpoint");
+	ms.SetTestAutonomous("Match", "Right", "Half Winpoint");
 
 	while(ms.should_update && (Competition.isFieldControl() || Competition.isCompetitionSwitch())){
 		ms.Update();

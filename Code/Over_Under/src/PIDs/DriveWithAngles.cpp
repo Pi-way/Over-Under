@@ -1,6 +1,8 @@
 
 #include "vex.h"
 
+double printerr = 0;
+
 int _Drive_With_Angles_()
 {   
   // Assign and declare local variables from global variables.
@@ -35,8 +37,8 @@ int _Drive_With_Angles_()
   bool NotDone = true;
   bool TurnNotDone = true;
   
-  PID LocalPID((0.375) * 0.5, 0.01, 0.07, 175, 25, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &TurnNotDone, 2, 0.25);
+  PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID((1.7675)*0.45, 0.0005, 0.029, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 0.125);
 
   robot.Encoder.setPosition(0, deg);
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -83,16 +85,13 @@ int _Drive_With_Angles_()
     RightDrive(setVelocity(RequestedRight, pct);)
     LeftDrive(setVelocity(RequestedLeft, pct);)
 
-    wait(20, msec);
+    wait(50, msec);
 
     //calculate horizontal and heading error
     Error = LocalDistance - robot.Encoder.position(degrees);
 
     SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
     TurnError = wrapAngleDeg(LocalList[currentIndex].second - robot.Inertial.heading(degrees));
-
-    clearConsole();
-    printf("%f", TurnError);
 
     if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
     {

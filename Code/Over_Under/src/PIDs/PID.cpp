@@ -14,13 +14,14 @@ int GetSign(double number)
     return (number < 0) ? -1 : 1;
 }
 
-PID::PID(double p, double i, double d, double r, double integral_cap, double speed_cap, bool *not_done, double timeout, double settle_time)
+PID::PID(double p, double i, double d, double r, double integral_cap, double integral_proximity, double speed_cap, bool *not_done, double timeout, double settle_time)
 {
     P = p;
     I = i;
     D = d;
     R = r;
 
+    IntegralProximity = integral_proximity;
     IntegralCap = integral_cap;
     SpeedCap = speed_cap;
     Timeout = timeout;
@@ -35,7 +36,11 @@ double PID::Update(double error, double dt)
     Time += dt;
     PreviousError = Error;
     Error = error;
-    Integral += error * dt;
+
+    if(std::abs(Error) < IntegralProximity) {
+        Integral += error * dt;
+    }
+
     Derivative = (Error - PreviousError) / dt;
 
 

@@ -25,7 +25,7 @@ void Robot::LaunchCatapult() {
     }
 
     not_done = true;
-    catapult_PID = PID(4, 2, 10, 500, 10, 75, &not_done, 10, 0);
+    catapult_PID = PID(4, 2, 10, 500, 10, 75, 360, &not_done, 10, 0);
 
     // Reload Catapult
     while (not_done) {
