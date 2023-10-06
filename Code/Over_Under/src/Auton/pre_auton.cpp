@@ -11,8 +11,8 @@ void pre_auton(void) {
 
 				DriveWithAngle(40, 0, 100, true, false, 1.75, 0);
 				DriveWithAngle(-40, 0, 75, true, false, 1.75, 0);
-				TurnAt(63, 100, true, false, 2, 0);
-				DriveWithAngle(-37, 63);
+				// TurnAt(63, 100, true, false, 2, 0);
+				// DriveWithAngle(-37, 63);
 
 			},
 			"Scores 1 alliance tri-ball, and touches barrier / elevation-bar"
@@ -23,8 +23,7 @@ void pre_auton(void) {
 		"Skills", "Right", "Winpoint",
 		new auton{
 			[](){
-				robot.Cata.spin(forward);
-				robot.Cata.setVelocity(80, pct);
+				DriveWithAngle(12, 0);
 			},
 			"This skills auto better work, or else I will quit my job. Oh wait, I already did. XD"
 		}

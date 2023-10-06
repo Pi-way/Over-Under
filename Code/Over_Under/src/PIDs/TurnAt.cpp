@@ -29,7 +29,7 @@ int _Turn_At_()
 
   bool NotDone = true;
   
-  PID LocalPID(0.475, 0.0625, 0.125, 200, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -52,9 +52,10 @@ int _Turn_At_()
     RightDrive(setVelocity(-OutputSpeed, pct);)
     LeftDrive(setVelocity(OutputSpeed, pct);)
 
-    vex::task::yield();
+    wait(20, msec);
 
     Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
+
 
   }
 

@@ -29,8 +29,10 @@ int _Drive_With_Angle_()
   }
 
   bool NotDone = true;
+  bool TurnNotDone = true;
   
-  PID LocalPID(0.15, 0.05, 0.125, 100, 10, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID((0.375) * 0.5, 0.01, 0.07, 175, 25, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID((1.8) * 0.5, 0.05, 1.125, 100, 100, LocalSpeed, &TurnNotDone, 1000000000, 1000000000);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -42,6 +44,7 @@ int _Drive_With_Angle_()
   double Error = LocalDistance - robot.Encoder.position(deg);
   double TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
+  double TurnCorrectionSpeed = 0;
 
   double ThisTime = Brain.Timer.systemHighResolution();
   double LastTime = ThisTime;
@@ -49,18 +52,24 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (NotDone)
+  while (true)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
-    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000);
 
-    RightDrive(setVelocity(OutputSpeed - TurnError * CorrectionCoeficient, pct);)
-    LeftDrive(setVelocity(OutputSpeed + TurnError * CorrectionCoeficient, pct);)
-
-    vex::task::yield();
     Error = LocalDistance - robot.Encoder.position(deg);
     TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
+
+    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000);
+    TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000);
+
+    RightDrive(setVelocity(OutputSpeed - TurnCorrectionSpeed, pct);)
+    LeftDrive(setVelocity(OutputSpeed + TurnCorrectionSpeed, pct);)
+
+    wait(20, msec);
+
+    printf("\x1B[2J\x1B[H");
+    printf("%f\n", Error);
   }
 
   RightDrive(setVelocity(0, pct);)
