@@ -1,8 +1,6 @@
 
 #include "vex.h"
 
-double printerr = 0;
-
 int _Drive_With_Angles_()
 {   
   // Assign and declare local variables from global variables.
@@ -36,9 +34,10 @@ int _Drive_With_Angles_()
 
   bool NotDone = true;
   bool TurnNotDone = true;
+  bool TurnNotDoneFR = true;
   
   PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.7675)*0.45, 0.0005, 0.029, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 0.125);
+  PID LocalTurnPID((1.7675)*0.5, 0.0005, 0.0225, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 0.125);
 
   robot.Encoder.setPosition(0, deg);
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -51,6 +50,7 @@ int _Drive_With_Angles_()
   //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
   double Error = LocalDistance - robot.Encoder.position(deg);
   double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
+  double LastTurnError;
   double OutputSpeed = 0;
   double TurnOutputSpeed = 0;
 
@@ -67,7 +67,7 @@ int _Drive_With_Angles_()
   LeftDrive(spin(forward);)
 
   //main loop
-  while (NotDone || TurnNotDone)
+  while (NotDone || TurnNotDoneFR)
   {
     //record current time for delta time calculation
     LastTime = ThisTime;
@@ -91,17 +91,20 @@ int _Drive_With_Angles_()
     Error = LocalDistance - robot.Encoder.position(degrees);
 
     SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
+    LastTurnError = TurnError;
     TurnError = wrapAngleDeg(LocalList[currentIndex].second - robot.Inertial.heading(degrees));
+
+    if(currentIndex + 1 == LocalList.size()) {
+      if(std::abs(TurnError) < 1){
+        TurnNotDoneFR = false;
+      }
+    }
 
     if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
     {
       if(currentIndex + 1 < LocalList.size()){
         currentIndex ++;
         DrivePos = robot.Encoder.position(deg);
-        TurnNotDone = true;
-        LocalTurnPID.HasReachedEnd = false;
-        LocalTurnPID.Time = 0;
-        LocalTurnPID.TimeReachedEnd = 0;
       }
       else
       {

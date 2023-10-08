@@ -5,6 +5,96 @@ Robot::Robot() {
     catapult_PID.HasRampedUp = true;
 }
 
+// How long do the wing release cylinders need to be activated for to close the wings?
+double wing_release_delay = 0.175;
+// How long do the wing release cylinders need to be activated for to open the wings?
+double wing_open_delay = 0.25;
+double main_wing_open_delay = 0.3;
+
+bool right_wing_open = false;
+bool left_wing_open = false;
+
+void ToggleRightWing(bool no_toggle, bool force_toggle_open) {
+  // If nothing needs to be done
+  if(no_toggle && (right_wing_open == force_toggle_open)){
+    return;
+  }
+
+  if (right_wing_open || (no_toggle == true && !force_toggle_open)) {
+
+    // If the wing is open and should be closed
+    robot.WingReleaseCylinder.set(true);
+    wait(wing_release_delay, seconds);
+    robot.WingReleaseCylinder.set(false);
+
+    right_wing_open = false;
+
+  } else {
+    // If the wing is closed and should be opened
+
+    robot.RightWingCylinder.set(true);
+
+    robot.WingReleaseCylinder.set(true);
+    wait(wing_open_delay, seconds);
+    robot.WingReleaseCylinder.set(false);
+
+    wait(main_wing_open_delay, seconds);
+    robot.RightWingCylinder.set(false);
+
+    right_wing_open = true;
+
+  }
+}
+
+void ToggleLeftWing(bool no_toggle, bool force_toggle_open) {
+  // If nothing needs to be done
+  if(no_toggle && (left_wing_open == force_toggle_open)){
+    return;
+  }
+
+  if (left_wing_open || (no_toggle == true && !force_toggle_open)) {
+
+    // If the wing is open and should be closed
+    robot.WingReleaseCylinder.set(true);
+    wait(wing_release_delay, seconds);
+    robot.WingReleaseCylinder.set(false);
+
+    left_wing_open = false;
+
+  } else {
+    // If the wing is closed and should be opened
+
+    robot.LeftWingCylinder.set(true);
+
+    robot.WingReleaseCylinder.set(true);
+    wait(wing_open_delay, seconds);
+    robot.WingReleaseCylinder.set(false);
+
+    wait(main_wing_open_delay, seconds);
+    robot.LeftWingCylinder.set(false);
+
+    left_wing_open = true;
+  }
+}
+
+void ToggleBothWings() {
+  if (right_wing_open || left_wing_open) {
+    //Force both wings shut
+    vex::task PistonTask = vex::task([]()->int{
+      ToggleRightWing(true, false);
+      return 0;
+    });
+    ToggleLeftWing(true, false);
+  } else {
+    //Force both wings open
+    vex::task PistonTask = vex::task([]()->int{
+      ToggleRightWing(true, true);
+      return 0;
+    });
+    ToggleLeftWing(true, true);
+  }
+}
+
 void Robot::LaunchCatapult() {
 
     // Initialize variables for measuring time

@@ -9,8 +9,6 @@
 
 #include <vex.h>
 
-double printer = 0;
-
 int _Turn_At_()
 {
     // Assign and declare local variables from global variables.
@@ -44,15 +42,6 @@ int _Turn_At_()
 
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
-
-  task printing_task = task([]()->int{
-    while(true){
-      wait(100, msec);
-      printf("\n");
-      printf("\033[31m %3.3f", (float)printer);
-    }
-    return 0;
-  });
   
   while (NotDone)
   {
@@ -64,7 +53,6 @@ int _Turn_At_()
     LeftDrive(setVelocity(OutputSpeed, pct);)
 
     wait(50, msec);
-    printer = LocalPID.Error;
 
     Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
 

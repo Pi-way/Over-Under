@@ -63,6 +63,11 @@ extern task msTask;
   robot.BL.MotorMember \
   robot.BBL.MotorMember
 
+#define Intake(MotorMember) \
+  robot.LeftIntake.MotorMember \
+  robot.RightIntake.MotorMember \
+
+
 typedef std::vector<std::pair<double, double >> distanceHeadingList;
 extern distanceHeadingList globalDistanceHeadingList;
 
@@ -75,6 +80,15 @@ extern int PIDsRunning;
 extern double TurnDistance;
 extern vex::task PIDTask;
 
+// How long do the wing release cylinders need to be activated for to close the wings?
+
+extern double wing_release_delay;
+// How long do the wing release cylinders need to be activated for to open the wings?
+extern double wing_open_delay;
+extern double main_wing_open_delay;
+
+extern bool right_wing_open;
+extern bool left_wing_open;
 
 void ToggleBothWings();
 void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false);

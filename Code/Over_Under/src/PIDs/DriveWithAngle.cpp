@@ -9,8 +9,6 @@
 
 #include "vex.h"
 
-double gooderprinter = 0;
-
 int _Drive_With_Angle_()
 {
   double CorrectionCoeficient = 1;
@@ -54,15 +52,6 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  task printing_task = task([]()->int{
-    while(true){
-      wait(100, msec);
-      printf("\n");
-      printf("\033[31m %3.3f", (float)gooderprinter);
-    }
-    return 0;
-  });
-
   while (NotDone)
   {
     LastTime = ThisTime;
@@ -78,7 +67,6 @@ int _Drive_With_Angle_()
     LeftDrive(setVelocity(OutputSpeed + TurnCorrectionSpeed, pct);)
 
     wait(20, msec);
-    gooderprinter = Error;
   }
 
   RightDrive(setVelocity(0, pct);)
