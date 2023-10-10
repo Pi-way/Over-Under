@@ -42,12 +42,9 @@ void pre_auton(void) {
 				DriveWithAngle(20, 180, 100, true, false, 0.75, 0);
 				DriveWithAngle(-10, 180);
 				TurnAt(0);
-				DriveWithAngles({{15, 110},{20.25, 90}});
-				// DriveWithAngle(-38, 180, 50, true, false, 2, 0);
-				// DriveWithAngle(3, 180);
-				// TurnAt(90);
+				DriveWithAngles({{15, 110},{20, 90}});
+				DriveWithAngle(5, 90, 25, true, false, 0.5, 0);
 
-				// DriveWithAngle(31, 87, 100, true, false, 1.5);
 
 				double end_time = Brain.Timer.systemHighResolution();
 				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);

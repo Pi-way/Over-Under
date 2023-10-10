@@ -35,8 +35,8 @@ void usercontrol(void) {
 
     //Intake Control
     if (Controller.ButtonR1.pressing()) {
-      robot.RightIntake.setVelocity(60, pct);
-      robot.LeftIntake.setVelocity(60, pct);
+      robot.RightIntake.setVelocity(100, pct);
+      robot.LeftIntake.setVelocity(100, pct);
     } else if (Controller.ButtonR2.pressing()) {
       robot.RightIntake.setVelocity(-100, pct);
       robot.LeftIntake.setVelocity(-100, pct);
