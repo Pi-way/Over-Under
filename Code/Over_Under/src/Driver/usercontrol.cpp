@@ -11,6 +11,17 @@ void usercontrol(void) {
   ms.should_update = false;
   Brain.Screen.clearScreen();
 
+  if (ms.GetAlliance() == AllianceEnum::Skills){
+    robot.Inertial.setHeading(150, deg);
+    robot.IntakeCylinder.set(true);
+    bool *NotDoneLaunchingTriBalls = new bool(true);
+    //DriveWithAngle(0, 150, 100, false, false, 0, 0, NotDoneLaunchingTriBalls);
+    robot.LaunchCatapultFor(49);
+    *NotDoneLaunchingTriBalls = false;
+  }
+
+  task cata_task = task([]()->int{robot.Cata.setBrake(hold); robot.LaunchCatapult(); return 0;});
+
   Controller.ButtonL1.pressed(CatapultLaunch);
   Controller.ButtonL2.pressed(ToggleBothWings);
   Controller.ButtonB.pressed([](){ToggleRightWing();});

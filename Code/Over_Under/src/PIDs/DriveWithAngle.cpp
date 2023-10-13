@@ -52,7 +52,7 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (NotDone)
+  while (NotDone || *NeverStopPtr)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
@@ -79,7 +79,7 @@ int _Drive_With_Angle_()
 }
 
 // Wrapper function that will accept arguments for the main function (_Drive_())
-void DriveWithAngle(double distance, double turn_target, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle)
+void DriveWithAngle(double distance, double turn_target, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle, bool *never_stop_ptr)
 {
 
   // Assign local variables to global variables
@@ -89,6 +89,7 @@ void DriveWithAngle(double distance, double turn_target, double speed, bool wait
   Coast = coast;
   CustomTimeout = coustom_timeout;
   SettleTime = coustom_settle;
+  NeverStopPtr = never_stop_ptr;
 
   // Either wait for the function to complete, or run the function in a task
   if (wait_for_completion)

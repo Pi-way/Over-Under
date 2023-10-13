@@ -145,6 +145,94 @@ void Robot::LaunchCatapult() {
     Cata.stop();
 }
 
+
+std::pair<CatapultObserver::catapult_state, double>
+CatapultObserver::GetCatapultState() {
+
+  //time
+  double this_time = Brain.Timer.value();
+  double delta_time = this_time - last_time;
+  time += delta_time;
+  last_time = this_time;
+
+  //position
+  double current_catapult_position = robot.catapult_rotation.position(deg);
+  double delta_catapult_position = current_catapult_position - last_catapult_position;
+  last_catapult_position = current_catapult_position;
+
+  //check if catapult is being loaded
+  if(delta_catapult_position < 0 && (current_catapult_position < maximum_catapult_position - 5 || current_catapult_position > 1)) {
+    current_state = LOADING;
+      //check if this is the state that has switched
+    if(last_state == LAUNCHING) {
+      time = 0;
+      current_state = STARTED_LOADING;
+    }
+  }
+
+  //check if catapult is being launched
+  if(delta_catapult_position > 0 && (current_catapult_position < maximum_catapult_position - 5 || current_catapult_position > 1)) {
+    current_state = LAUNCHING;
+    //check if this is the state that has switched
+    if(last_state == LOADING) {
+      time = 0;
+      current_state = STARTED_LAUNCHING;
+    }
+  }
+
+  last_state = current_state;
+
+  Brain.Screen.clearScreen();
+  Brain.Screen.setCursor(1,1);
+  Brain.Screen.print((int)current_state);
+  Brain.Screen.setCursor(2, 1);
+  Brain.Screen.print(time);
+
+  //exception state
+  return {current_state, time};
+}
+
+void Robot::LaunchCatapultFor(int amount){
+  
+  //create observer and start observing
+  CatapultObserver observer;
+  observer.GetCatapultState();
+  std::pair<CatapultObserver::catapult_state, double> state;
+
+  int launches = 0;
+
+  robot.Cata.spin(fwd);
+
+  double return_to_speed_delay = .125;
+
+  robot.Cata.setVelocity(100, pct);
+
+  while (true) {
+
+    waitUntil(robot.catapult_rotation.angle(deg) < 5);
+
+    robot.Cata.setVelocity(10, pct);
+
+    wait(return_to_speed_delay, sec);
+
+    robot.Cata.setVelocity(100, pct);
+
+    launches += 1;
+
+    if(launches > amount - 1){
+      break;
+    }
+
+    waitUntil(robot.catapult_rotation.angle(deg) > 20);
+
+    wait(20, msec);
+
+  }
+
+  Cata.setVelocity(0, pct);
+
+}
+
 competition Competition;
 brain Brain;
 controller Controller;
@@ -154,12 +242,15 @@ MatchSelector ms;
 task msTask;
 
 distanceHeadingList globalDistanceHeadingList;
+std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
 
 double Distance;
 double Speed;
 bool Coast;
 double CustomTimeout;
 double SettleTime;
+bool *NeverStopPtr;
+bool *FalsePtr = new bool(false);
 int PIDsRunning = 0;
 double TurnDistance;
 vex::task PIDTask;
