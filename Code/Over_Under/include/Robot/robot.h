@@ -18,6 +18,7 @@ public:
   Robot();
 
   void LaunchCatapult();
+  void LaunchC();
   void LaunchCatapultFor(int amount);
 
   motor FR = motor(PORT1, ratio6_1, false);

@@ -5,6 +5,10 @@ void CatapultLaunch() {
   robot.LaunchCatapult();
 }
 
+void LaunchC() {
+  robot.LaunchC();
+}
+
 void usercontrol(void) {
 
   Calibrate();
@@ -20,10 +24,18 @@ void usercontrol(void) {
     *NotDoneLaunchingTriBalls = false;
   }
 
-  task cata_task = task([]()->int{robot.Cata.setBrake(hold); robot.LaunchCatapult(); return 0;});
+  task cata_task = task([]()->int{
+    if (ms.GetAlliance() == AllianceEnum::Skills) {
+      robot.LaunchCatapult();
+    }
+    return 0;
+  });
+
+  robot.Cata.setBrake(hold); 
 
   Controller.ButtonL1.pressed(CatapultLaunch);
   Controller.ButtonL2.pressed(ToggleBothWings);
+  Controller.ButtonX.pressed(LaunchC);
   Controller.ButtonB.pressed([](){ToggleRightWing();});
   Controller.ButtonDown.pressed([](){ToggleLeftWing();});
 
@@ -55,8 +67,6 @@ void usercontrol(void) {
       robot.RightIntake.setVelocity(0, pct);
       robot.LeftIntake.setVelocity(0, pct);
     }
-
-
 
     wait(20, msec);
   }

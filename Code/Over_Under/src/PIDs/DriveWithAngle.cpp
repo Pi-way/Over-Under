@@ -52,7 +52,7 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (NotDone || *NeverStopPtr)
+  while (NotDone && *NeverStopPtr)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();

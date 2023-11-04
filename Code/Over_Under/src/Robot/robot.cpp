@@ -145,6 +145,54 @@ void Robot::LaunchCatapult() {
     Cata.stop();
 }
 
+void Robot::LaunchC() {
+      // Initialize variables for measuring time
+    double this_time = Brain.Timer.value();
+    double last_time = this_time;
+    double delta_time = this_time - last_time;
+
+    // Initialize variables for Catapult control
+    double Cata_speed = 0;
+    double Cata_error = 0;
+    Cata.spin(forward);
+    Cata.setBrake(hold);
+
+    // Launch Catapult
+    Cata.setVelocity(50, pct);
+    while (wrapAngleDeg(catapult_rotation.angle(deg)) < 20) {
+        wait(20, msec);
+    }
+
+    not_done = true;
+    catapult_PID = PID(4, 2, 0.2, 500, 10, 360, 100, &not_done, 10, 0);
+
+    wait(0.45, sec);
+
+    // Reload Catapult
+    while (not_done || Controller.ButtonL1.pressing()) {
+
+        last_time = this_time;
+        this_time = Brain.Timer.value();
+        delta_time = this_time - last_time;
+
+        Cata_error = wrapAngleDeg(catapult_rotation.angle(deg) - 10);
+        Cata_speed = catapult_PID.Update(Cata_error, delta_time);
+
+        if(Controller.ButtonL1.pressing()) {
+            Cata_speed = 85;
+        }
+
+        Cata.setVelocity(Cata_speed, pct);
+        wait(20, msec);
+
+        Brain.Screen.clearScreen();
+        Brain.Screen.setCursor(1,1);
+        Brain.Screen.print(Cata_error);
+
+    }
+
+    Cata.stop();
+}
 
 std::pair<CatapultObserver::catapult_state, double>
 CatapultObserver::GetCatapultState() {
@@ -250,7 +298,7 @@ bool Coast;
 double CustomTimeout;
 double SettleTime;
 bool *NeverStopPtr;
-bool *FalsePtr = new bool(false);
+bool *FalsePtr = new bool(true);
 int PIDsRunning = 0;
 double TurnDistance;
 vex::task PIDTask;
