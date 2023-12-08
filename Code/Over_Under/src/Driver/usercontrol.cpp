@@ -26,7 +26,7 @@ void usercontrol(void) {
 
   task cata_task = task([]()->int{
     if (ms.GetAlliance() == AllianceEnum::Skills) {
-      robot.LaunchCatapult();
+      robot.LaunchCatapult(); 
     }
     return 0;
   });
@@ -67,6 +67,10 @@ void usercontrol(void) {
       robot.RightIntake.setVelocity(0, pct);
       robot.LeftIntake.setVelocity(0, pct);
     }
+
+    Brain.Screen.clearScreen();
+    Brain.Screen.setCursor(6,1);
+    Brain.Screen.print(robot.Inertial.pitch(deg));
 
     wait(20, msec);
   }
