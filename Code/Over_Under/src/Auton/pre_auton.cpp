@@ -1,308 +1,180 @@
 #include "vex.h"
 #include <functional>
 
-//HI AYLA THIS IS A COMMENT CHEESBURGER
-
 void pre_auton(void) {
 
-	ms.Assign(
-		"Match", "Right", "Half Winpoint",
-		new auton{
-			[](){
+	ms.Assign("Match", "Left", "Half Winpoint", new auton {
+		[](){
+			double st = Brain.Timer.time(sec);
+			robot.Inertial.setHeading(41.5, deg);
 
-				double start_time = Brain.Timer.systemHighResolution();
+			robot.RightWing.set(true);
 
-				robot.Inertial.setHeading(180, deg);
-				robot.IntakeCylinder.set(true);
-				DriveWithAngle(20, 135);
-				ToggleRightWing();
-				DriveWithAngles({{-17, 145}});
-				DriveWithAngles({{15, 0},{33, 135}}, 100, false);
-				wait(0.5, sec);
-				ToggleRightWing();
-				TurnAt(180);
-				Intake(spin(forward);)
-				Intake(setVelocity(-100, pct);)
+			vex::task ball_set_up = vex::task([]()->int{
+				robot.Intake.setVelocity(100, pct);
+				robot.Intake.spin(fwd);
 				wait(0.25, sec);
-				DriveWithAngle(20, 180, 100, true, false, 0.75, 0);
-				Intake(stop();)
-				DriveWithAngle(-10, 180);
-				DriveWithAngle(20, 180, 100, true, false, 0.75, 0);
-				DriveWithAngle(-10, 180);
-				TurnAt(-90);
-				DriveWithAngles({{35, 0}});
-				bool not_at_pitch = true;
-
-				DriveWithAngle(45, 0, 100, false, false, 1000, 0, &not_at_pitch);
-
-				waitUntil(robot.Inertial.pitch(deg) > 25);
-
-				not_at_pitch = false;
-
-				robot.LeftWingCylinder.set(true);
-				robot.WingReleaseCylinder.set(true);
-
-				wait(0.25, sec);
-
-				robot.WingReleaseCylinder.set(false);
-
-				double end_time = Brain.Timer.systemHighResolution();
-				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);
-
-			},
-			"Removes a tri-ball from the match load zone, scores an alliance ball, and touches the bar."
-		}
-	);
-
-	ms.Assign(
-		"Match", "Left", "Half Winpoint",
-		new auton{
-			[](){
-
-				double start_time = Brain.Timer.systemHighResolution();
-
-				robot.Inertial.setHeading(180, deg);
-				robot.IntakeCylinder.set(true);
-				DriveWithAngle(20, -135);
-				ToggleLeftWing();
-
-				Intake(spin(fwd);)
-				Intake(setVelocity(-100, pct);)
-				
-				DriveWithAngles({{-17, -145}});
-				DriveWithAngle(6, -145, 100, true, false, 0.5);
-				ToggleLeftWing();
-				Intake(stop();)
-				
-				
-				TurnAt(45);
-
-				DriveWithAnglesAndSpeed({{-12, {20, 85}}, {-12, {90, 90}}});
-				DriveWithAngle(-6, 90, 100, true, false, 1);
-				
-				DriveWithAngle(10, 0, 100, true, false);
-
-				TurnAt(-22, 100, true, false, 0.75);
-				DriveWithAngle(16, -22);
-				TurnAt(0, 100, true, false, 0.75);
-
-				//DriveWithAngles({{15, 0},{33, -135}}, 100, false);
-				// wait(0.5, sec);
-				// 
-				// TurnAt(180);
-				// Intake(spin(forward);)
-				// Intake(setVelocity(-100, pct);)
-				// wait(0.25, sec);
-				// DriveWithAngle(20, 180, 100, true, false, 0.75, 0);
-				// Intake(stop();)
-				// DriveWithAngle(-10, 180);
-				// DriveWithAngle(20, 180, 100, true, false, 0.75, 0);
-				// DriveWithAngle(-30, 180);
-				// TurnAt(90);
-
-				bool not_at_pitch = true;
-
-				DriveWithAngle(100, 0, 100, false, false, 1000, 0, &not_at_pitch);
-
-				waitUntil(robot.Inertial.pitch(deg) > 25);
-
-				not_at_pitch = false;
-
-				robot.RightWingCylinder.set(true);
-				robot.WingReleaseCylinder.set(true);
-
-				wait(0.25, sec);
-
-				robot.WingReleaseCylinder.set(false);
-
-				double end_time = Brain.Timer.systemHighResolution();
-				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);
-
-
-			},
-			"Removes tri-ball from match load zone, scores an alliance ball, and touches the bar."
-		}
-	);
-
-		ms.Assign(
-		"Match", "Left", "Simple",
-		new auton{
-			[](){
-
-				double start_time = Brain.Timer.systemHighResolution();
-
-				robot.Inertial.setHeading(180, deg);
-				robot.IntakeCylinder.set(true);
-				DriveWithAngle(20, -135);
-				ToggleLeftWing();
-
-				Intake(spin(fwd);)
-				Intake(setVelocity(-100, pct);)
-				
-				DriveWithAngles({{-17, -145}});
-				DriveWithAngle(6, -145, 100, true, false, 0.5);
-				ToggleLeftWing();
-				Intake(stop();)
-
-			},
-			"Removes tri-ball from match load zone."
-		}
-	);
-
-	ms.Assign(
-		"Match", "Left", "Complex",
-		new auton{
-			[](){
-
-				double start_time = Brain.Timer.systemHighResolution();
-				robot.IntakeCylinder.set(true);
-				robot.LaunchC();
-
-				Intake(stop();)
-				Intake(setVelocity(100, pct);)
-
-				robot.Inertial.setHeading(-45, deg);
-				
-				DriveWithAnglesAndSpeed({{42, {-90, 80}}, {4, {180, 50}}});
-				Intake(spinFor(-1.25, turns, false);)
-				DriveWithAngle(20, 180, 100, true, false, 1);
-				DriveWithAngle(-6, 180);
-				TurnAt(90);
-
-				DriveWithAnglesAndSpeed({{12, {90, 75}}, {36, {135, 50}}});
-				TurnAt(152);
+				robot.Intake.setVelocity(0, pct);
 				robot.LaunchCatapult();
-
-
-				double end_time = Brain.Timer.systemHighResolution();
-				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);
-
-
-			},
-			"Scores An alliance ball, and lines up to match load"
-		}
-	);
-
-		ms.Assign(
-		"Match", "Right", "Complex",
-		new auton{
-			[](){
-
-				double start_time = Brain.Timer.systemHighResolution();
-
-				robot.Inertial.setHeading(-180, degrees);
-
-				robot.IntakeCylinder.set(true);
-				robot.LaunchC();
-
-				Intake(spin(forward);)
-				Intake(setVelocity(100, pct);)
-
-				DriveWithAngle(8, 180);
-
-				Intake(setVelocity(0, pct);)
-
-				DriveWithAnglesAndSpeed({{-5, {180, 95}}, {-30,{135, 75}}, {-24, {90, 85}}}, 100, false);
-
-				wait(1, sec);
-
-				ToggleLeftWing();
-				
-				waitUntil(PIDsRunning == 0);
-				
-				DriveWithAngle(12, 150, 100, false);
+				robot.Cata.setVelocity(50, pct);
+				//robot.Cata.spinFor(-1, turns);
+				robot.Cata.setBrake(coast);
 				wait(0.5, sec);
-				ToggleLeftWing();
+				robot.Cata.setBrake(hold);
+				return 0;
+			});
+			vex::task wingdeploy = vex::task([]()->int{
+				double st = Brain.Timer.time(sec);
+				waitUntil(Brain.Timer.time(sec) - st > 14.9);
+				robot.RightWing.set(true);
+				return 0;
+			});
+			
+			wait(0.25, sec);
+			TurnAt(-45,75);
 
-				DriveWithAnglesAndSpeed({{-12, {150, 80}}}, 100, true, false, 0.75);
+			robot.RightWing.set(false);
 
-				TurnAt(90, 100, true, false, 0.5);
-				DriveWithAngle(6, 90, 100, true, false, 0.4);
+			DriveWithAnglesAndSpeed({{27, {-65, 60}}, {15, {180, 70}}}, 100, true, false, 4555, 1);
+			DriveWithAngle(1.25, 180, 45);
+			robot.Intake.setVelocity(-100, pct);
+			wait(0.5, sec);
+			robot.Intake.setVelocity(0, pct);
+			DriveWithAngle(-8, 180);
+			TurnAt(90);
+			robot.RightWing.set(true);
+			wait(0.5, sec);
+			DriveWithAngle(-2, 135);
+			TurnAt(180, 20);
+			DriveWithAnglesAndSpeed({{-40, {180, 95}}}, 100, true, false, 1.4);
+			robot.RightWing.set(false);
+			TurnAt(-100);
+			DriveWithAngle(-22, -100);
+			TurnAt(-73);
+			robot.RightWing.set(true);
+			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
-				
-				DriveWithAngle(-12, 90, 100, true, false, 1);
-				
+		},
+		"De-scores the match load tri-ball, then Scores the alliance tri-ball, and pushes two green tri-balls over to the far side. After... It touches the bar."
+	});
 
-				DriveWithAngle(12, 90, 100, true, false, 1);
+	ms.Assign("Match", "Left", "Complex", new auton {
+		[](){
+			double st = Brain.Timer.time(sec);
+			robot.Inertial.setHeading(41.5, deg);
 
-				TurnAt(-90);
+			robot.RightWing.set(true);
 
-				Intake(spin(forward);)
-				Intake(setVelocity(-100, pct);)
+			vex::task ball_set_up = vex::task([]()->int{
+				robot.Intake.setVelocity(100, pct);
+				robot.Intake.spin(fwd);
+				wait(0.25, sec);
+				robot.Intake.setVelocity(0, pct);
+				robot.LaunchCatapult();
+				robot.Cata.setVelocity(50, pct);
+				//robot.Cata.spinFor(-1, turns);
+				robot.Cata.setBrake(coast);
+				wait(0.5, sec);
+				robot.Cata.setBrake(hold);
+				return 0;
+			});
+			
+			wait(0.25, sec);
+			TurnAt(-45,75);
 
-				TurnAt(90);
+			robot.RightWing.set(false);
 
-				DriveWithAngle(-12, 90, 100, true, false, 1);
+			DriveWithAnglesAndSpeed({{27, {-65, 60}}, {15, {180, 70}}}, 100, true, false, 4555, 1);
+			DriveWithAngle(1.25, 180, 45);
+			robot.Intake.setVelocity(-100, pct);
+			wait(0.5, sec);
+			robot.Intake.setVelocity(0, pct);
+			DriveWithAngle(-6.5, 180);
+			TurnAt(90);
+			robot.RightWing.set(true);
+			wait(0.5, sec);
+			DriveWithAngle(-2, 135);
+			TurnAt(180, 20);
+			DriveWithAnglesAndSpeed({{-40, {180, 95}}}, 100, true, false, 1.4);
+			robot.RightWing.set(false);
+			TurnAt(-45);
+			DriveWithAngle(-50, -45, 100, true, 2.5);
+			TurnAt(-20);
+			robot.RightWing.set(true);
+			robot.RightLift.set(true);
+			robot.LeftLift.set(true);
+			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
-				
-				
-				double end_time = Brain.Timer.systemHighResolution();
-				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);
-				
+		},
+		"De-scores the match load tri-ball, then Scores the alliance tri-ball, and pushes two green tri-balls over to the far side. After... It lines up to shoot"
+	});
 
-			},
-			"Scores A lot-a balls"
-		}
-	);
+	ms.Assign("Skills", "Left", "Half Winpoint", new auton{
+		[](){
 
-	ms.Assign(
-		"Skills", "Right", "Simple",
-		new auton{
-			[](){
-				double start_time = Brain.Timer.systemHighResolution();
+			double st = Brain.Timer.time(sec);
+			robot.Inertial.setHeading(41.5, deg);
 
-				robot.Inertial.setHeading(152, deg);
-				robot.IntakeCylinder.set(true);
+			vex::task ball_set_up = vex::task([]()->int{
+				robot.Intake.setVelocity(100, pct);
+				robot.Intake.spin(fwd);
+				wait(0.25, sec);
+				robot.Intake.setVelocity(0, pct);
+				return 0;
+			});
 
-				Intake(spinFor(-1, turns, false);)
+			DriveWithAnglesAndSpeed({{-5, {40, 95}}, {-25, {90, 80}}}, 100, true, false, 2);
+			
+			DriveWithAnglesAndSpeed({{20, {7, 90}}});
+			TurnAt(-20);
+			robot.RightWing.set(true);
+			robot.LaunchCatapultFor(47);
+			robot.RightWing.set(false);
+			DriveWithAnglesAndSpeed({{6, {-135, 60}}});
+			DriveWithAnglesAndSpeed({{-8, {-150, 90}}, {-70, {180, 95}}, {-10, {135, 25}}, {-23, {135, 95}}, {-5, {90, 25}}, {-19, {90, 95}}}, 100, true, false, 6);
+			DriveWithAngle(7, 90);
+			DriveWithAngle(-20, 90, 100, true, false, 1.25);
 
-				robot.LaunchCatapultFor(49);
+		}, "Skillz."
+	});
 
-				task cata_task = task([]()->int{robot.Cata.setBrake(hold); robot.LaunchC(); return 0;});
+	ms.Assign("Match", "Right", "Simple", new auton{
+		[](){
+			double st = Brain.Timer.time(sec);
+			robot.Inertial.setHeading(180, deg);
 
-				DriveWithAnglesAndSpeed({{-12, {112, 80}}, {-12, {90, 80}}, {-40, {90, 100}}, {-22, {0, 50}}}, 100, true, false, 4.5);
-				DriveWithAngle(40, 0, 100, true, false, 3, 0);
-				DriveWithAngle(-20, 0, 100, true, false, 1);
+			vex::task ball_set_up = vex::task([]()->int{
+				robot.Intake.spin(fwd);
+				robot.Intake.setVelocity(35, pct);
+				wait(1.125, sec);
+				robot.Intake.setVelocity(0, pct);
+				return 0;
+			});
 
-				robot.IntakeCylinder.set(false);
-				ToggleBothWings();
-				
-				Intake(spin(fwd);)
-				Intake(setVelocity(-100, pct);)
-				DriveWithAnglesAndSpeed({{15, {25, 95}}, {15, {0, 95}}}, 100, true, false, 1.5);
-				ToggleBothWings();
-				DriveWithAngle(-12, 15, 100, true, false, 0.75);
-				ToggleBothWings();
-				DriveWithAnglesAndSpeed({{15, {25, 95}}, {15, {0, 95}}}, 100, true, false, 1.5);
-				ToggleBothWings();
-				DriveWithAnglesAndSpeed({{-3, {0, 95}}, {-50, {-90, 90}}},100, true, false, 3);
-				DriveWithAngle(12, -90, 80);
-				TurnAt(10);
-				ToggleBothWings();
-				DriveWithAnglesAndSpeed({{15, {-25, 95}}, {15, {0, 95}}}, 100, true, false, 1.5);
-				ToggleBothWings();
-				DriveWithAngle(-23, -15, 100, true, false, 0.75);
-				ToggleBothWings();
-				DriveWithAnglesAndSpeed({{15, {-25, 95}}, {15, {0, 95}}}, 100, true, false, 1.5);
-				ToggleBothWings();
-				DriveWithAngle(-10, 0);
-				TurnAt(90);
-				ToggleRightWing();
-				DriveWithAnglesAndSpeed({{12, {80, 95}}, {30, {12, 95}}, {5, {45, 95}}}, 100, true, false, 1.5);
+			wait(0.5, sec);
 
-				double end_time = Brain.Timer.systemHighResolution();
-				printf(" %3.3f\n", (end_time - start_time) / 1000000.0);
+			DriveWithAngle(-24, 180);
+			DriveWithAnglesAndSpeed({{-24, {135, 50}}}, 100, false);
+			wait(0.5, sec);
+			robot.LeftWing.set(true);
+			wait(0.75, sec);
+			robot.LeftWing.set(false);
+			DriveWithAngle(-24, 90, 100, true, false, 1.25);
+			DriveWithAngle(10, 90);
+			TurnAt(-90);
+			robot.Intake.setVelocity(-100, pct);
+			DriveWithAngle(24, -90, 100, true, false, 1.25);
+			DriveWithAngle(-5, -90);
+			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
-			},
-			"This skills auto better work, or else I will quit my job. Oh wait, I already did. XD"
-		}
-	);
-
-	ms.SetTestAutonomous("Match", "Left", "Half Winpoint");
+		},
+		"yeeeet."
+	});
+	
+	ms.SetTestAutonomous("Match", "Right", "Simple");
 
 	while(ms.should_update && (Competition.isFieldControl() || Competition.isCompetitionSwitch())){
 		ms.Update();
 		wait(20, msec);
 	}
-
 }

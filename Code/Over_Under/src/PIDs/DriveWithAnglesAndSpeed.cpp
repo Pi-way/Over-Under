@@ -37,7 +37,7 @@ int _Drive_With_Angles_And_Speed_()
   bool TurnNotDoneFR = true;
   
   PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalList[0].second.second, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.7675)*0.5, 0.0005, 0.0225, 200, 10, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
+  PID LocalTurnPID((1.7675)*0.5, 0.0005, 0.024, 200, 10, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
 
   robot.Encoder.setPosition(0, deg);
   RightDrive(setStopping((LocalCoast) ? coast : brake);)

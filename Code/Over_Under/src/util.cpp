@@ -1,5 +1,10 @@
 #include "vex.h"
 
+int GetSign(double number)
+{
+    return (number < 0) ? -1 : 1;
+}
+
 double wrapAngleRad(double angle)
 {
 

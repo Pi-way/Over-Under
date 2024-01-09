@@ -18,31 +18,29 @@ public:
   Robot();
 
   void LaunchCatapult();
-  void LaunchC();
   void LaunchCatapultFor(int amount);
 
-  motor FR = motor(PORT1, ratio6_1, false);
-  motor FL = motor(PORT4, ratio6_1, true);
+  motor FR = motor(PORT6, ratio6_1, false);
+  motor FL = motor(PORT3, ratio6_1, true);
 
-  motor BR = motor(PORT2, ratio6_1, true);
-  motor BL = motor(PORT5, ratio6_1, false);
+  motor BR = motor(PORT5, ratio6_1, true);
+  motor BL = motor(PORT2, ratio6_1, false);
 
-  motor BBR = motor(PORT3, ratio6_1, false);
-  motor BBL = motor(PORT6, ratio6_1, true);
+  motor BBR = motor(PORT4, ratio6_1, false);
+  motor BBL = motor(PORT1, ratio6_1, true);
 
-  rotation catapult_rotation = rotation(PORT19);
-  motor Cata = motor(PORT9, ratio36_1, true);
+  rotation catapult_rotation = rotation(PORT8, true);
+  motor Cata = motor(PORT7, ratio18_1, false);
 
-  rotation Encoder = rotation(PORT20, true);
-  inertial Inertial = inertial(PORT10);
+  rotation Encoder = rotation(PORT12, false);
+  inertial Inertial = inertial(PORT13);
 
-  motor LeftIntake = motor(PORT7, ratio18_1, false);
-  motor RightIntake = motor(PORT8, ratio18_1, true);
+  motor Intake = motor(PORT10, ratio6_1, true);
 
-  digital_out IntakeCylinder = digital_out(Brain.ThreeWirePort.A);
-  digital_out WingReleaseCylinder = digital_out(Brain.ThreeWirePort.B);
-  digital_out RightWingCylinder = digital_out(Brain.ThreeWirePort.C);
-  digital_out LeftWingCylinder = digital_out(Brain.ThreeWirePort.D);
+  digital_out RightLift = digital_out(Brain.ThreeWirePort.C);
+  digital_out LeftLift = digital_out(Brain.ThreeWirePort.D);
+  digital_out RightWing = digital_out(Brain.ThreeWirePort.A);
+  digital_out LeftWing = digital_out(Brain.ThreeWirePort.B);
 
 };
 
@@ -86,11 +84,6 @@ extern task msTask;
   robot.BL.MotorMember \
   robot.BBL.MotorMember
 
-#define Intake(MotorMember) \
-  robot.LeftIntake.MotorMember \
-  robot.RightIntake.MotorMember \
-
-
 typedef std::vector<std::pair<double, double >> distanceHeadingList;
 extern distanceHeadingList globalDistanceHeadingList;
 extern std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
@@ -116,9 +109,10 @@ extern double main_wing_open_delay;
 extern bool right_wing_open;
 extern bool left_wing_open;
 
+void ToggleLift();
 void ToggleBothWings();
-void ToggleRightWing(bool no_toggle = false, bool force_toggle_open = false);
-void ToggleLeftWing(bool no_toggle = false, bool force_toggle_open = false);
+void ToggleRightWing();
+void ToggleLeftWing();
 void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
 void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);

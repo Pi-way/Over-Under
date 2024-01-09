@@ -9,11 +9,6 @@
 
 #include "vex.h"
 
-int GetSign(double number)
-{
-    return (number < 0) ? -1 : 1;
-}
-
 PID::PID(double p, double i, double d, double r, double integral_cap, double integral_proximity, double speed_cap, bool *not_done, double timeout, double settle_time)
 {
     P = p;

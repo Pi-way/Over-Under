@@ -1,5 +1,7 @@
 #define PI 3.14159
 
+int GetSign(double number);
+
 double wrapAngleRad(double angle);
 
 double wrapAngleDeg(double angle);
