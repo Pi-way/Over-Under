@@ -18,7 +18,7 @@ void usercontrol(void) {
   Brain.Screen.clearScreen();
 
   if (ms.GetAlliance() == AllianceEnum::Skills){
-    	robot.Inertial.setHeading(41.5, deg);
+    	odom.inert.setHeading(41.5, deg);
 
 			vex::task ball_set_up = vex::task([]()->int{
 				robot.Intake.setVelocity(100, pct);

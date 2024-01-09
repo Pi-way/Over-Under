@@ -32,8 +32,9 @@ public:
   rotation catapult_rotation = rotation(PORT8, true);
   motor Cata = motor(PORT7, ratio18_1, false);
 
-  rotation Encoder = rotation(PORT12, false);
-  inertial Inertial = inertial(PORT13);
+  // rotation Encoder = rotation(PORT12, false);
+  // rotation Encoder2 = rotation(PORT11, true);
+  // inertial Inertial = inertial(PORT13);
 
   motor Intake = motor(PORT10, ratio6_1, true);
 
@@ -70,7 +71,7 @@ void autonomous();
 void pre_auton();
 
 extern Robot robot;
-//extern Odometry odom;
+extern Odometry odom;
 extern MatchSelector ms;
 extern task msTask;
 

@@ -42,7 +42,7 @@ int _Drive_With_Angle_()
 
   robot.Encoder.setPosition(0, deg);
   double Error = LocalDistance - robot.Encoder.position(deg);
-  double TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
+  double TurnError = wrapAngleDeg(LocalTurnDistance - odom.inert.heading(degrees));
   double OutputSpeed = 0;
   double TurnCorrectionSpeed = 0;
 
@@ -58,7 +58,7 @@ int _Drive_With_Angle_()
     ThisTime = Brain.Timer.systemHighResolution();
 
     Error = LocalDistance - robot.Encoder.position(deg);
-    TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
+    TurnError = wrapAngleDeg(LocalTurnDistance - odom.inert.heading(degrees));
 
     OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
     TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000.0);

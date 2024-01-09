@@ -2,8 +2,8 @@
 
 int Calibrate()
 {
-    //odom.Calibrate();
-    robot.Inertial.calibrate();
+    odom.Calibrate();
+    odom.inert.calibrate();
 
     robot.BL.spin(fwd);
     robot.BR.spin(fwd);

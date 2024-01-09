@@ -2,17 +2,26 @@
 using namespace vex;
 
 class TrackingWheel{
+private:
+    rotation encoder = NULL;
+
 public:
+    const bool reverse = false;
+    const double diameter = NULL;
 
     TrackingWheel(rotation _encoder, double _diameter, bool _reverse = false);
+    TrackingWheelObserver* getObserver();
+};
 
-    rotation encoder = NULL;
-    double diameter = NULL;
+class TrackingWheelObserver{
+public:
+    TrackingWheelObserver(TrackingWheel _parent);
 
-    bool reverse = false;
+    void setPosition(double _position);
+    double getTravel();
+    double position();
 
+    double zero_offset = 0;
     double previous_angle = 0;
     double current_angle = 0;
-
-    double get_travel();
 };

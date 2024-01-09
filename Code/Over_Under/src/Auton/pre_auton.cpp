@@ -6,7 +6,7 @@ void pre_auton(void) {
 	ms.Assign("Match", "Left", "Half Winpoint", new auton {
 		[](){
 			double st = Brain.Timer.time(sec);
-			robot.Inertial.setHeading(41.5, deg);
+			odom.inert.setHeading(41.5, deg);
 
 			robot.RightWing.set(true);
 
@@ -61,7 +61,7 @@ void pre_auton(void) {
 	ms.Assign("Match", "Left", "Complex", new auton {
 		[](){
 			double st = Brain.Timer.time(sec);
-			robot.Inertial.setHeading(41.5, deg);
+			odom.inert.setHeading(41.5, deg);
 
 			robot.RightWing.set(true);
 
@@ -113,7 +113,7 @@ void pre_auton(void) {
 		[](){
 
 			double st = Brain.Timer.time(sec);
-			robot.Inertial.setHeading(41.5, deg);
+			odom.inert.setHeading(41.5, deg);
 
 			vex::task ball_set_up = vex::task([]()->int{
 				robot.Intake.setVelocity(100, pct);
@@ -141,7 +141,7 @@ void pre_auton(void) {
 	ms.Assign("Match", "Right", "Simple", new auton{
 		[](){
 			double st = Brain.Timer.time(sec);
-			robot.Inertial.setHeading(180, deg);
+			odom.inert.setHeading(180, deg);
 
 			vex::task ball_set_up = vex::task([]()->int{
 				robot.Intake.spin(fwd);

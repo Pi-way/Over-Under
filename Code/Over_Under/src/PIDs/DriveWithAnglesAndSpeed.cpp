@@ -49,7 +49,7 @@ int _Drive_With_Angles_And_Speed_()
 
   //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
   double Error = LocalDistance - robot.Encoder.position(deg);
-  double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
+  double TurnError = wrapAngleDeg(localTurnDistance - odom.inert.heading(degrees));
   double LastTurnError;
   double OutputSpeed = 0;
   double TurnOutputSpeed = 0;
@@ -94,7 +94,7 @@ int _Drive_With_Angles_And_Speed_()
 
     SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
     LastTurnError = TurnError;
-    TurnError = wrapAngleDeg(LocalList[currentIndex].second.first - robot.Inertial.heading(degrees));
+    TurnError = wrapAngleDeg(LocalList[currentIndex].second.first - odom.inert.heading(degrees));
 
     if(currentIndex + 1 == LocalList.size()) {
       if(std::abs(TurnError) < 1){

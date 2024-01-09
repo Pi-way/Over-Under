@@ -6,11 +6,10 @@ public:
 
     Odometry();
 
-    TrackingWheel fr_fwd = TrackingWheel(rotation(PORT5), 3.25, true);
-    TrackingWheel fl_fwd = TrackingWheel(rotation(PORT6), 3.25);
-    TrackingWheel b_s = TrackingWheel(rotation(PORT8), 3.25);
+    TrackingWheel fwd = TrackingWheel(rotation(PORT12), 3.25, true);
+    TrackingWheel strafe = TrackingWheel(rotation(PORT11), 3.25);
 
-    inertial inert = inertial(PORT11, left);
+    inertial inert = inertial(PORT13, left);
 
     double strafe_radius = 4.5;
 

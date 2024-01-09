@@ -161,7 +161,7 @@ competition Competition;
 brain Brain;
 controller Controller;
 Robot robot;
-//Odometry odom;
+Odometry odom;
 MatchSelector ms;
 task msTask;
 
