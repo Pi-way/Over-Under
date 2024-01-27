@@ -9,7 +9,8 @@
 #include <functional>
 #include <vector>
 #include <sstream>
-
+#include <algorithm>
+#include <fstream>
 
 #include "v5.h"
 #include "v5_vcs.h"
@@ -21,6 +22,8 @@
 #include "Auton/match_selector.h"
 #include "Robot/robot.h"
 
+#include "PurePursuit/PurePursuitFunctions.h"
+#include "PurePursuit/PurePursuit.h"
 
 #include "Auton/PID.h"
 

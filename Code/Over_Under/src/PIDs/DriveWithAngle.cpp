@@ -11,9 +11,8 @@
 
 int _Drive_With_Angle_()
 {
-  double CorrectionCoeficient = 1;
     // Assign and declare local variables from global variables.
-  double LocalDistance = ((Distance/(2.75*3.1415))*(1))*360.0;
+  double LocalDistance = Distance;
   double LocalTurnDistance = TurnDistance;
   double LocalSpeed = Speed;
   bool LocalCoast = Coast;
@@ -31,8 +30,8 @@ int _Drive_With_Angle_()
   bool NotDone = true;
   bool TurnNotDone = true;
   
-  PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.7675)*0.45, 0.0005, 0.029, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 1000000000);
+  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 1000000);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -40,9 +39,10 @@ int _Drive_With_Angle_()
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
-  robot.Encoder.setPosition(0, deg);
-  double Error = LocalDistance - robot.Encoder.position(deg);
-  double TurnError = wrapAngleDeg(LocalTurnDistance - odom.inert.heading(degrees));
+  auto Encoder = robot.ForwardTrack.getObserver();
+
+  double Error = LocalDistance - Encoder->position();
+  double TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
   double TurnCorrectionSpeed = 0;
 
@@ -57,8 +57,8 @@ int _Drive_With_Angle_()
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
 
-    Error = LocalDistance - robot.Encoder.position(deg);
-    TurnError = wrapAngleDeg(LocalTurnDistance - odom.inert.heading(degrees));
+    Error = LocalDistance - Encoder->position();
+    TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
 
     OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
     TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000.0);
@@ -68,6 +68,8 @@ int _Drive_With_Angle_()
 
     wait(20, msec);
   }
+
+  delete Encoder;
 
   RightDrive(setVelocity(0, pct);)
   LeftDrive(setVelocity(0, pct);)

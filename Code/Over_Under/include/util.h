@@ -16,3 +16,7 @@ void rotatePoint(double& x, double& y, double angle);
 uint8_t* copyStringStreamToHeap(std::stringstream& ss);
 
 void clearConsole();
+
+double GetAngleTo(double x, double y, double heading, double target_x, double target_y);
+
+double GetDistance(double x1, double y1, double x2, double y2);

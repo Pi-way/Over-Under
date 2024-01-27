@@ -60,3 +60,41 @@ uint8_t* copyStringStreamToHeap(std::stringstream& ss) {
 void clearConsole() {
     printf("\x1B[2J\x1B[H");
 }
+
+double GetDistance(double x1, double y1, double x2, double y2){
+    return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+}
+
+double GetAngleTo(double x, double y, double heading, double target_x, double target_y){
+
+    // calculate a point directly in front of the robot (exactly 1 inch away)
+    double x2 = x + cos(degToRad(heading));
+    double y2 = y + sin(degToRad(heading));
+
+    // get Distance B and C for arccos function
+    double distance_b = GetDistance(x, y, target_x, target_y);
+    double distance_c = GetDistance(x2, y2, target_x, target_y);
+
+    // get the positive angle from the robot to the target
+    double angle_to;
+    double a = pow(distance_c, 2) - pow(distance_b, 2) - 1;
+    double b = -2 * distance_b;
+    
+    if(b == 0.0){
+        angle_to = 0;
+    }else if(a/b > 1 || a/b < -1){
+        angle_to = 0;
+    }else{
+        angle_to = radToDeg(acos(a/b));
+    }
+        
+    // Move the target point so that relative to the robot, the robot would be at (0, 0) and assign that point to MTX and MTY
+    double mtx = target_x - x;
+    double mty = target_y - y;
+
+    // Get rotated Y value that will determine if the robot needs to drive left or right
+    double rotated_y = -mtx*sin(degToRad(heading))+mty*cos(degToRad(heading));
+
+    // Make LocalTurn positive or negative depending on which direction the robot needs to drive
+    return angle_to * GetSign(rotated_y);
+}

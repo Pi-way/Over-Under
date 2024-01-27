@@ -1,9 +1,12 @@
 #include "vex.h"
 
-int Calibrate()
+int Calibrate( bool inert)
 {
-    odom.Calibrate();
-    odom.inert.calibrate();
+    if(inert){
+        odom.Calibrate();
+        robot.Inertial.calibrate();
+    }
+
 
     robot.BL.spin(fwd);
     robot.BR.spin(fwd);
@@ -29,7 +32,7 @@ int Calibrate()
     robot.BBR.setBrake(coast);
     robot.Intake.setBrake(coast);
 
-    robot.Cata.setBrake(hold);
+    robot.Cata.setBrake(coast);
     robot.Cata.spin(forward);
     robot.Cata.setVelocity(0, pct);
 
@@ -37,6 +40,7 @@ int Calibrate()
     robot.LeftLift.set(false);
     robot.RightWing.set(false);
     robot.LeftWing.set(false);
+    robot.SideElevation.set(false);
 
     return 0;
 };

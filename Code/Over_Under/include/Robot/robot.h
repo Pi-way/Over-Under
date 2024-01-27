@@ -6,6 +6,8 @@ extern competition Competition;
 extern brain Brain;
 extern controller Controller;
 
+extern bool letrun;
+
 class Robot{
 private:
 
@@ -18,6 +20,7 @@ public:
   Robot();
 
   void LaunchCatapult();
+  void LaunchCatapultButNot();
   void LaunchCatapultFor(int amount);
 
   motor FR = motor(PORT6, ratio6_1, false);
@@ -32,9 +35,9 @@ public:
   rotation catapult_rotation = rotation(PORT8, true);
   motor Cata = motor(PORT7, ratio18_1, false);
 
-  // rotation Encoder = rotation(PORT12, false);
-  // rotation Encoder2 = rotation(PORT11, true);
-  // inertial Inertial = inertial(PORT13);
+  TrackingWheel ForwardTrack = TrackingWheel(rotation(PORT12), 2.75, false);
+  TrackingWheel StrafeTrack = TrackingWheel(rotation(PORT11), 2.75, false);
+  inertial Inertial = inertial(PORT13);
 
   motor Intake = motor(PORT10, ratio6_1, true);
 
@@ -42,6 +45,7 @@ public:
   digital_out LeftLift = digital_out(Brain.ThreeWirePort.D);
   digital_out RightWing = digital_out(Brain.ThreeWirePort.A);
   digital_out LeftWing = digital_out(Brain.ThreeWirePort.B);
+  digital_out SideElevation = digital_out(Brain.ThreeWirePort.H);
 
 };
 
@@ -88,6 +92,8 @@ extern task msTask;
 typedef std::vector<std::pair<double, double >> distanceHeadingList;
 extern distanceHeadingList globalDistanceHeadingList;
 extern std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
+extern std::pair<double, double> Target;
+extern bool UseFront;
 
 extern double Distance;
 extern double Speed;
@@ -115,6 +121,7 @@ void ToggleBothWings();
 void ToggleRightWing();
 void ToggleLeftWing();
 void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
+void TurnAtPoint(std::pair<double, double> target, bool use_front = true, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
 void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
 void DriveWithAnglesAndSpeed(std::vector<std::pair<double, std::pair<double, double>>> List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);

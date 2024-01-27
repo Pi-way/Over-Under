@@ -12,7 +12,7 @@ int _Drive_With_Angles_()
 
   for(auto indicies = LocalList.begin(); indicies != LocalList.end(); indicies++ )
   {
-    LocalDistance += ( indicies->first / (2.75*3.1415) ) * 360.0;
+    LocalDistance += indicies->first;
   }
 
   int currentIndex = 0;
@@ -36,20 +36,21 @@ int _Drive_With_Angles_()
   bool TurnNotDone = true;
   bool TurnNotDoneFR = true;
   
-  PID LocalPID((0.35)*0.6, 0.05, 0.0025, 200, 25, 20, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID((1.7675)*0.5, 0.0005, 0.0225, 200, 10, 6, LocalSpeed, &TurnNotDone, 10000000000, 0.125);
+  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 0.125);
 
-  robot.Encoder.setPosition(0, deg);
+  auto Encoder = robot.ForwardTrack.getObserver();
+
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
   double DrivePos = 0;
 
-  double SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
+  double SmallError = LocalList[currentIndex].first - (Encoder->position() - DrivePos);
 
   //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
-  double Error = LocalDistance - robot.Encoder.position(deg);
-  double TurnError = wrapAngleDeg(localTurnDistance - odom.inert.heading(degrees));
+  double Error = LocalDistance - Encoder->position();
+  double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
   double LastTurnError;
   double OutputSpeed = 0;
   double TurnOutputSpeed = 0;
@@ -88,11 +89,11 @@ int _Drive_With_Angles_()
     wait(50, msec);
 
     //calculate horizontal and heading error
-    Error = LocalDistance - robot.Encoder.position(degrees);
+    Error = LocalDistance - Encoder->position();
 
-    SmallError = (( LocalList[currentIndex].first / (2.75*3.1415) ) * 360.0) - (robot.Encoder.position(deg) - DrivePos);
+    SmallError = LocalList[currentIndex].first - (Encoder->position() - DrivePos);
     LastTurnError = TurnError;
-    TurnError = wrapAngleDeg(LocalList[currentIndex].second - odom.inert.heading(degrees));
+    TurnError = wrapAngleDeg(LocalList[currentIndex].second - robot.Inertial.heading(deg));
 
     if(currentIndex + 1 == LocalList.size()) {
       if(std::abs(TurnError) < 1){
@@ -104,7 +105,7 @@ int _Drive_With_Angles_()
     {
       if(currentIndex + 1 < LocalList.size()){
         currentIndex ++;
-        DrivePos = robot.Encoder.position(deg);
+        DrivePos = Encoder->position();
       }
       else
       {
@@ -112,6 +113,8 @@ int _Drive_With_Angles_()
       }
     }
   }
+
+  delete Encoder;
 
   //stop the motors
   RightDrive(setVelocity(0, pct);)

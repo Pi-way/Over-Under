@@ -9,15 +9,18 @@
 
 #include <vex.h>
 
-int _Turn_At_()
+int _Turn_At_Point_()
 {
     // Assign and declare local variables from global variables.
-  double LocalDistance = TurnDistance;
+  auto LocalTarget = Target;
+  bool LocalUseFront = UseFront;
 
   double LocalSpeed = Speed;
   bool LocalCoast = Coast;
   double LocalTimeout = CustomTimeout;
   double LocalSettle = SettleTime;
+
+  double offset = LocalUseFront ? 0 : 180;
 
   // Update PIDsRunning
   PIDsRunning ++;
@@ -29,12 +32,12 @@ int _Turn_At_()
 
   bool NotDone = true;
   
-  PID LocalPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalPID(1.3 * 0.5, 0.001, 0.015, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
-  double Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
+  double Error = -wrapAngleDeg(GetAngleTo(odom.x, odom.y, odom.h + offset, LocalTarget.first, LocalTarget.second));
   double OutputSpeed = 0;
 
   double ThisTime = Brain.Timer.systemHighResolution();
@@ -54,7 +57,7 @@ int _Turn_At_()
 
     wait(50, msec);
 
-    Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
+    Error = -wrapAngleDeg(GetAngleTo(odom.x, odom.y, odom.h + offset, LocalTarget.first, LocalTarget.second));
 
   }
 
@@ -68,11 +71,12 @@ int _Turn_At_()
 }
 
 // Wrapper function that will accept arguments for the main function (_Drive_())
-void TurnAt(double turn_distance, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle)
+void TurnAtPoint(std::pair<double, double> target, bool use_front, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle)
 {
 
   // Assign local variables to global variables
-  TurnDistance = turn_distance;
+  UseFront = use_front;
+  Target = target;
   Speed = speed;
   Coast = coast;
   CustomTimeout = coustom_timeout;
@@ -81,10 +85,10 @@ void TurnAt(double turn_distance, double speed, bool wait_for_completion, bool c
   // Either wait for the function to complete, or run the function in a task
   if (wait_for_completion)
   {
-    _Turn_At_();
+    _Turn_At_Point_();
   }
   else
   {
-    PIDTask = task(_Turn_At_);
+    PIDTask = task(_Turn_At_Point_);
   }
 }

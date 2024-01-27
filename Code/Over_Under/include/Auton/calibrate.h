@@ -1,1 +1,2 @@
-int Calibrate();
+int Calibrate(bool inert = true);
+int updateOdometry();

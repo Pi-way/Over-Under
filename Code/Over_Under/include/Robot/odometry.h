@@ -6,12 +6,10 @@ public:
 
     Odometry();
 
-    TrackingWheel fwd = TrackingWheel(rotation(PORT12), 3.25, true);
-    TrackingWheel strafe = TrackingWheel(rotation(PORT11), 3.25);
+    TrackingWheelObserver* ForwardObserver = nullptr; 
+    TrackingWheelObserver* StrafeObserver = nullptr;
 
-    inertial inert = inertial(PORT13, left);
-
-    double strafe_radius = 4.5;
+    double strafe_radius = 2.75;
 
     double previous_heading = 0;
     double current_heading = 0;

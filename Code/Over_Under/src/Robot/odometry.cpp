@@ -1,23 +1,23 @@
 #include "vex.h"
 using namespace vex;
 
-Odometry::Odometry() {
+Odometry::Odometry() {  
     // Constructor
+    ForwardObserver = robot.ForwardTrack.getObserver();
+    StrafeObserver = robot.StrafeTrack.getObserver();
 }
 
 void Odometry::Update() {
     // Get change in encoder position in inches
-    double fr_fwd_travel = fr_fwd.get_travel();
-    double fl_fwd_travel = fl_fwd.get_travel();
-    double b_s_travel = b_s.get_travel();
+    double fwd_travel = ForwardObserver->getTravel();
+    double b_s_travel = StrafeObserver->getTravel();
 
     // Calculate delta_theta.
     previous_heading = current_heading;
-    current_heading = degToRad(inert.rotation(deg));
-    double delta_theta = current_heading - previous_heading;
+    current_heading = degToRad(wrapAngleDeg(360 - robot.Inertial.rotation(deg)));
+    double delta_theta = degToRad(wrapAngleDeg(radToDeg(current_heading) - radToDeg(previous_heading)));
 
     // Calculate fwd and strafe travel distances; (x and y respectively.)
-    double fwd_travel = (fr_fwd_travel + fl_fwd_travel) / 2.0;
     double strafe_travel = b_s_travel + delta_theta * strafe_radius;
 
     // Rotate the point (fwd, strafe) to convert from a local coordinate shift to a global coordinate shift.
@@ -32,9 +32,8 @@ void Odometry::Update() {
 
 void Odometry::Calibrate(double _x, double _y, double _h) {
     // Reset inertial sensor.
-    inert.calibrate();
-    inert.setHeading(_h, deg);
-    inert.setRotation(_h, deg);
+    robot.Inertial.setHeading(_h, deg);
+    robot.Inertial.setRotation(_h, deg);
 
     // Apply changes to odometry location.
     x = _x;

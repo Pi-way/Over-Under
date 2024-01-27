@@ -234,7 +234,7 @@ void MatchSelector::Update()
     bool Calibrate_pressed = Calibrate_button.Update();
     if(Calibrate_pressed)
     {   
-        msTask = vex::task(Calibrate);
+        msTask = vex::task([](){Calibrate();return 0;});
         StartCountdown();
 
         alliance_button.DrawReleased();

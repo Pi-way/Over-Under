@@ -1,6 +1,8 @@
 #include "vex.h"
 using namespace vex;
 
+bool letrun = true;
+
 Robot::Robot() {
     catapult_PID.HasRampedUp = true;
 }
@@ -28,6 +30,52 @@ void ToggleLift(){
   robot.LeftLift.set(!robot.LeftLift.value());
 }
 
+void Robot::LaunchCatapultButNot() {
+
+    // Initialize variables for measuring time
+    double this_time = Brain.Timer.value();
+    double last_time = this_time;
+    double delta_time = this_time - last_time;
+
+    // Initialize variables for Catapult control
+    double Cata_speed = 0;
+    double Cata_error = 0;
+    Cata.spin(forward);
+    Cata.setBrake(hold);
+
+    // Launch Catapult
+    Cata.setVelocity(100, pct);
+    while (wrapAngleDeg(catapult_rotation.angle(deg) - 20) < 20 || wrapAngleDeg(catapult_rotation.angle(deg) - 20) > 80) {
+        wait(20, msec);
+    }
+
+    not_done = true;
+    catapult_PID = PID(2.25, 0.1, 0.07, 500, 10, 360, 100, &not_done, 10, 0);
+
+    letrun = true;
+
+    // Reload Catapult
+    while ((not_done || Controller.ButtonL1.pressing()) && letrun) {
+
+        last_time = this_time;
+        this_time = Brain.Timer.value();
+        delta_time = this_time - last_time;
+
+        Cata_error = wrapAngleDeg(catapult_rotation.angle(deg) - 29);
+        Cata_speed = catapult_PID.Update(Cata_error, delta_time);
+
+        if(Controller.ButtonL1.pressing()) {
+            Cata_speed = 100;
+        }
+
+        Cata.setVelocity(Cata_speed, pct);
+        wait(20, msec);
+    }
+    letrun = true;
+    Cata.stop();
+}
+
+vex::task tiskTisk;
 void Robot::LaunchCatapult() {
 
     // Initialize variables for measuring time
@@ -48,10 +96,12 @@ void Robot::LaunchCatapult() {
     }
 
     not_done = true;
-    catapult_PID = PID(1.5, 0.1, 0.125, 500, 10, 360, 100, &not_done, 10, 0);
+    catapult_PID = PID(2.25, 0.1, 0.07, 500, 10, 360, 100, &not_done, 10, 0);
+
+    letrun = true;
 
     // Reload Catapult
-    while (not_done || Controller.ButtonL1.pressing()) {
+    while ((not_done || Controller.ButtonL1.pressing()) && letrun) {
 
         last_time = this_time;
         this_time = Brain.Timer.value();
@@ -61,14 +111,24 @@ void Robot::LaunchCatapult() {
         Cata_speed = catapult_PID.Update(Cata_error, delta_time);
 
         if(Controller.ButtonL1.pressing()) {
-            Cata_speed = 100;
+          Cata_speed = 100;
+          catapult_PID.HasReachedEnd = false;
+          not_done = true;
         }
 
         Cata.setVelocity(Cata_speed, pct);
         wait(20, msec);
     }
+    letrun = true;
     Cata.stop();
+
+    wait(0.25, sec);
+    if(wrapAngleDeg(robot.catapult_rotation.angle(deg)) > 5){
+      letrun = false;
+      robot.LaunchCatapult();
+    }
 }
+
 
 std::pair<CatapultObserver::catapult_state, double>
 CatapultObserver::GetCatapultState() {
@@ -135,8 +195,6 @@ void Robot::LaunchCatapultFor(int amount){
 
     waitUntil(robot.catapult_rotation.angle(deg) < 5);
 
-    //robot.Cata.setVelocity(10, pct);
-
     wait(return_to_speed_delay, sec);
 
     robot.Cata.setVelocity(100, pct);
@@ -161,12 +219,15 @@ competition Competition;
 brain Brain;
 controller Controller;
 Robot robot;
+PurePursuitRobot PureRobot;
 Odometry odom;
 MatchSelector ms;
 task msTask;
+bool UseFront;
 
 distanceHeadingList globalDistanceHeadingList;
 std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
+std::pair<double, double> Target;
 
 double Distance;
 double Speed;
