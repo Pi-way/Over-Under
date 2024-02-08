@@ -215,6 +215,12 @@ void Robot::LaunchCatapultFor(int amount){
 
 }
 
+
+int32_t WatchPort(int32_t port){
+  PortWatch.push_back(vex::device(port));
+  return port;
+}
+
 competition Competition;
 brain Brain;
 controller Controller;
@@ -228,6 +234,7 @@ bool UseFront;
 distanceHeadingList globalDistanceHeadingList;
 std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
 std::pair<double, double> Target;
+std::vector<vex::device> PortWatch;
 
 double Distance;
 double Speed;

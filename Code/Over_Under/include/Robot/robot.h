@@ -8,6 +8,10 @@ extern controller Controller;
 
 extern bool letrun;
 
+extern std::vector<vex::device> PortWatch;
+
+int32_t WatchPort(int32_t port);
+
 class Robot{
 private:
 
@@ -23,23 +27,23 @@ public:
   void LaunchCatapultButNot();
   void LaunchCatapultFor(int amount);
 
-  motor FR = motor(PORT6, ratio6_1, false);
-  motor FL = motor(PORT3, ratio6_1, true);
+  motor FR = motor(WatchPort(PORT6), ratio6_1, false);
+  motor FL = motor(WatchPort(PORT3), ratio6_1, true);
 
-  motor BR = motor(PORT5, ratio6_1, true);
-  motor BL = motor(PORT2, ratio6_1, false);
+  motor BR = motor(WatchPort(PORT5), ratio6_1, true);
+  motor BL = motor(WatchPort(PORT2), ratio6_1, false);
 
-  motor BBR = motor(PORT4, ratio6_1, false);
-  motor BBL = motor(PORT1, ratio6_1, true);
+  motor BBR = motor(WatchPort(PORT4), ratio6_1, false);
+  motor BBL = motor(WatchPort(PORT1), ratio6_1, true);
 
-  rotation catapult_rotation = rotation(PORT8, true);
-  motor Cata = motor(PORT7, ratio18_1, false);
+  rotation catapult_rotation = rotation(WatchPort(PORT8), true);
+  motor Cata = motor(WatchPort(PORT7), ratio18_1, false);
 
-  TrackingWheel ForwardTrack = TrackingWheel(rotation(PORT12), 2.75, false);
-  TrackingWheel StrafeTrack = TrackingWheel(rotation(PORT11), 2.75, false);
-  inertial Inertial = inertial(PORT13);
+  TrackingWheel ForwardTrack = TrackingWheel(rotation(WatchPort(PORT12)), 2.75, false);
+  TrackingWheel StrafeTrack = TrackingWheel(rotation(WatchPort(PORT11)), 2.75, false);
+  inertial Inertial = inertial(WatchPort(PORT13));
 
-  motor Intake = motor(PORT10, ratio6_1, true);
+  motor Intake = motor(WatchPort(PORT10), ratio6_1, true);
 
   digital_out RightLift = digital_out(Brain.ThreeWirePort.C);
   digital_out LeftLift = digital_out(Brain.ThreeWirePort.D);
@@ -106,6 +110,8 @@ extern int PIDsRunning;
 extern double TurnDistance;
 extern vex::task PIDTask;
 
+extern PID TurnPID;
+
 // How long do the wing release cylinders need to be activated for to close the wings?
 
 extern double wing_release_delay;
@@ -120,7 +126,7 @@ void ToggleLift();
 void ToggleBothWings();
 void ToggleRightWing();
 void ToggleLeftWing();
-void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
+void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2, bool start_at_100 = false);
 void TurnAtPoint(std::pair<double, double> target, bool use_front = true, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
 void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);

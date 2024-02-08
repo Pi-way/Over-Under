@@ -9,6 +9,9 @@
 
 #include <vex.h>
 
+PID TurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 0, nullptr, 0, 0);
+bool sa100 = false;
+
 int _Turn_At_()
 {
     // Assign and declare local variables from global variables.
@@ -26,10 +29,10 @@ int _Turn_At_()
   while(PIDsRunning > 1){
     task::yield();
   }
-
-  bool NotDone = true;
   
-  PID LocalPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  bool NotDone = true;
+
+  TurnPID = PID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -42,12 +45,17 @@ int _Turn_At_()
 
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
+
+  if(sa100){
+    TurnPID.HasRampedUp = true;
+    TurnPID.RampUp = 1000000;
+  }
   
   while (NotDone)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
-    OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
+    OutputSpeed = TurnPID.Update(Error, (ThisTime - LastTime)/1000000.0);
 
     RightDrive(setVelocity(-OutputSpeed, pct);)
     LeftDrive(setVelocity(OutputSpeed, pct);)
@@ -67,8 +75,10 @@ int _Turn_At_()
 
 }
 
+
+
 // Wrapper function that will accept arguments for the main function (_Drive_())
-void TurnAt(double turn_distance, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle)
+void TurnAt(double turn_distance, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle, bool start_at_100)
 {
 
   // Assign local variables to global variables
@@ -77,6 +87,8 @@ void TurnAt(double turn_distance, double speed, bool wait_for_completion, bool c
   Coast = coast;
   CustomTimeout = coustom_timeout;
   SettleTime = coustom_settle;
+
+  sa100 = start_at_100;
 
   // Either wait for the function to complete, or run the function in a task
   if (wait_for_completion)
