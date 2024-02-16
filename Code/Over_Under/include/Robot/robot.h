@@ -25,7 +25,8 @@ public:
 
   void LaunchCatapult();
   void LaunchCatapultButNot();
-  void LaunchCatapultFor(int amount);
+  void LaunchCatapultFor(int n);
+  void LaunchCatapultUntilButtonPressed();
 
   motor FR = motor(WatchPort(PORT6), ratio6_1, false);
   motor FL = motor(WatchPort(PORT3), ratio6_1, true);
@@ -36,7 +37,7 @@ public:
   motor BBR = motor(WatchPort(PORT4), ratio6_1, false);
   motor BBL = motor(WatchPort(PORT1), ratio6_1, true);
 
-  rotation catapult_rotation = rotation(WatchPort(PORT8), true);
+  rotation catapult_rotation = rotation(WatchPort(PORT8), false);
   motor Cata = motor(WatchPort(PORT7), ratio18_1, false);
 
   TrackingWheel ForwardTrack = TrackingWheel(rotation(WatchPort(PORT12)), 2.75, false);
@@ -45,11 +46,9 @@ public:
 
   motor Intake = motor(WatchPort(PORT10), ratio6_1, true);
 
-  digital_out RightLift = digital_out(Brain.ThreeWirePort.C);
-  digital_out LeftLift = digital_out(Brain.ThreeWirePort.D);
   digital_out RightWing = digital_out(Brain.ThreeWirePort.A);
   digital_out LeftWing = digital_out(Brain.ThreeWirePort.B);
-  digital_out SideElevation = digital_out(Brain.ThreeWirePort.H);
+  digital_out SideElevation = digital_out(Brain.ThreeWirePort.E);
 
 };
 
@@ -122,7 +121,6 @@ extern double main_wing_open_delay;
 extern bool right_wing_open;
 extern bool left_wing_open;
 
-void ToggleLift();
 void ToggleBothWings();
 void ToggleRightWing();
 void ToggleLeftWing();

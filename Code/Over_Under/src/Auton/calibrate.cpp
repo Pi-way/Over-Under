@@ -1,5 +1,7 @@
 #include "vex.h"
 
+bool resetWings = true;
+
 int Calibrate( bool inert)
 {
     if(inert){
@@ -36,10 +38,10 @@ int Calibrate( bool inert)
     robot.Cata.spin(forward);
     robot.Cata.setVelocity(0, pct);
 
-    robot.RightLift.set(false);
-    robot.LeftLift.set(false);
-    robot.RightWing.set(false);
-    robot.LeftWing.set(false);
+    if(resetWings){
+        robot.RightWing.set(false);
+        robot.LeftWing.set(false);
+    }
     robot.SideElevation.set(false);
 
     return 0;

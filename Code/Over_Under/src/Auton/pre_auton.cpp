@@ -62,57 +62,13 @@ void pre_auton(void) {
 			robot.RightWing.set(false);
 			wait(0.25, sec);
 			TurnAt(-100, 100, true, false, 1);
-			DriveWithAngle(-22, -100, 100, true, false, 1);
+			DriveWithAngle(-23.5, -100, 100, true, false, 1.125);
 			TurnAt(-73, 100, true, false, 1);
 			robot.RightWing.set(true);
 			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
 		},
 		"De-scores the match load tri-ball, then Scores the alliance tri-ball, and pushes two green tri-balls over to the far side. After... It touches the bar."
-	});
-
-	ms.Assign("Match", "Left", "Complex", new auton {
-		[](){
-			double st = Brain.Timer.time(sec);
-			robot.Inertial.setHeading(46.5, deg);
-
-			robot.RightWing.set(true);
-
-			vex::task ball_set_up = vex::task([]()->int{
-				robot.Intake.setVelocity(100, pct);
-				robot.Intake.spin(fwd);
-				wait(0.25, sec);
-				robot.Intake.setVelocity(0, pct);
-				return 0;
-			});
-			
-			wait(0.25, sec);
-			TurnAt(-45,75);
-
-			robot.RightWing.set(false);
-
-			DriveWithAnglesAndSpeed({{15, {-75, 60}}, {15, {180, 70}}, {3, {180, 5}}, {6, {180, 90}}}, 100, true, false, 2, 0.125);
-			robot.Intake.setVelocity(-100, pct);
-			wait(0.5, sec);
-			robot.Intake.setVelocity(0, pct);
-			DriveWithAngle(-8, 180, 100, true, false, 1);
-			TurnAt(90, 100, true, false, 1);
-			robot.RightWing.set(true);
-			wait(0.5, sec);
-			DriveWithAngle(-2, 135, 100, true, false, 0.75);
-			TurnAt(180, 20);
-			DriveWithAnglesAndSpeed({{-40, {180, 95}}}, 100, true, false, 1.4);
-			robot.RightWing.set(false);
-			TurnAt(-45);
-			DriveWithAngle(-50, -45, 100, true, 2.5);
-			TurnAt(-20);
-			robot.RightWing.set(true);
-			robot.RightLift.set(true);
-			robot.LeftLift.set(true);
-			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
-
-		},
-		"De-scores the match load tri-ball, then Scores the alliance tri-ball, and pushes two green tri-balls over to the far side. After... It lines up to shoot"
 	});
 
 	ms.Assign("Skills", "Left", "Half Winpoint", new auton{
@@ -131,11 +87,11 @@ void pre_auton(void) {
 			});
 
 			DriveWithAnglesAndSpeed({{-7, {42, 85}},{-8, {90, 25}},{-30, {90, 75}}}, 100, true, false, 1.5);
-			DriveWithAnglesAndSpeed({{13, {60, 85}}}, 100, true, false, 1);
-			TurnAtPoint({48, -12}, true, 100, false, false, 3);
+			DriveWithAnglesAndSpeed({{14.5, {60, 85}}}, 100, true, false, 1);
+			TurnAtPoint({48, -6}, true, 100, false, false, 3);
 			wait(0.75, sec);
 			robot.RightWing.set(true);
-			robot.LaunchCatapultFor(45);
+			robot.LaunchCatapultFor(Competition.isFieldControl() ? (50) : (1));
 
 			vex::task ball_set_up2 = vex::task([]()->int{
 				robot.Cata.setBrake(coast);
@@ -145,57 +101,59 @@ void pre_auton(void) {
 				return 0;
 			});
 
-			TurnAtPoint({-40, -63}, false, 100, true, false, 1.25, 0.125);
+			TurnAtPoint({-40, -67}, false, 100, true, false, 1.25, 0.125);
 
 			double angle = robot.Inertial.heading(deg);
 
-			DriveWithAnglesAndSpeed({{-30, {angle, 100}}, {-12, {188, 20}}, {-49, {188, 95}}, {-10, {135, 25}}, {-8, {135, 95}}, {-10, {90, 25}}, {-24, {90, 95}}}, 100, true, false, 5);
+			robot.Intake.setVelocity(-100, pct);
+
+			DriveWithAnglesAndSpeed({{-30, {angle, 100}}, {-12, {188, 20}}, {-45, {188, 95}}, {-10, {135, 25}}, {-11, {135, 95}}, {-10, {90, 25}}, {-24, {90, 95}}}, 100, true, false, 5);
 			DriveWithAngle(9, 90, 100, true, false, 0.75);
-			DriveWithAngle(-24, 90, 100, true, false, 0.75);
+			DriveWithAngle(-14, 90, 100, true, false, 0.75);
 			DriveWithAngle(3, 45, 25, true, false, 1.25, 0);
 			TurnAtPoint({24, -36}, false, 100, true, false, 1.25, 0.125);
 
 			angle = robot.Inertial.heading(deg);
 
-			DriveWithAnglesAndSpeed({{-28, {angle, 85}}, {-12, {90, 25}}, {-32, {90, 85}}}, 100, true, false, 3.5);
+			DriveWithAnglesAndSpeed({{-23, {angle, 85}}, {-12, {90, 25}}, {-32, {90, 85}}}, 100, true, false, 3.5);
 			TurnAtPoint({48, -6}, false, 100, true, false, 1.25, 0.125);
 
 			angle = robot.Inertial.heading(deg);
 
-			DriveWithAngle(-50, angle, 100, true, false, 1.25);
-			DriveWithAnglesAndSpeed({{7, {angle, 95}}, {9, {-90, 12}}, {38, {-90, 95}}}, 100, true, false, 2.5);
+			DriveWithAngle(-50, angle, 100, true, false, 1.25); //StriaghtPushNoWings
+			DriveWithAnglesAndSpeed({{6.5, {angle, 95}}, {9, {-90, 7}}, {28, {-90, 95}}}, 100, true, false, 2.5);//DriveAwayFar
 
 			TurnAtPoint({48, 0}, false, 100, true, false, 1.25, 0.125);
 			angle = robot.Inertial.heading(deg);
 
 			ToggleBothWings();
 
-			DriveWithAngle(-50, angle, 100, true, false, 1.25);
+			DriveWithAngle(-50, angle, 100, true, false, 1.5);//PushWithWingsFar
 
 			ToggleBothWings();
 
-			DriveWithAnglesAndSpeed({{5, {180, 95}}, {9, {90, 12}}, {50, {90, 95}}}, 100, true, false, 2.5);
+			DriveWithAnglesAndSpeed({{6.5, {180, 95}}, {9, {90, 12}}, {33, {90, 95}}}, 100, true, false, 2.5);//DriveAwayClose
 			TurnAtPoint({48, 0}, false, 100, true, false, 1.25, 0.125);
 			angle = robot.Inertial.heading(deg);
 
 			ToggleBothWings();
 
-			DriveWithAngle(-50, angle, 100, true, false, 1.25);
+			DriveWithAngle(-50, angle, 100, true, false, 1.25);//PushWithWingsClose
 			
 			ToggleBothWings();
 			DriveWithAngle(12, angle, 100, true, false, 1);
 
-			TurnAtPoint({12, 0}, true, 100, true, false, 1.25, 0.125);
-			angle = robot.Inertial.heading(deg);
+			// TurnAtPoint({12, 0}, true, 100, true, false, 1.25, 0.125);
+			// angle = robot.Inertial.heading(deg);
 
-			DriveWithAngle(30, angle, 100, true, false, 1.25);
+			// DriveWithAngle(30, angle, 100, true, false, 1.25);
 
-			TurnAtPoint({48, 0}, false, 100, true, false, 1.25, 0.125);
-			angle = robot.Inertial.heading(deg);
+			// TurnAtPoint({48, 0}, false, 100, true, false, 1.25, 0.125);
+			// angle = robot.Inertial.heading(deg);
 
-			ToggleBothWings();
+			// ToggleBothWings();
 
-			DriveWithAngle(-50, angle, 100, true, false, 1);
+			// DriveWithAngle(-50, angle, 100, true, false, 1);
 
 
 			std::cout << Brain.Timer.time(sec) - st << std::endl;
@@ -235,7 +193,7 @@ void pre_auton(void) {
 			robot.LeftWing.set(false);
 			wait(0.125, sec);
 			DriveWithAnglesAndSpeed({{-6, {90, 50}}, {-18, {90, 100}}}, 100, true, false, 1.2);
-			DriveWithAngle(6, 90, 100, true, false, 0.6);
+			DriveWithAngle(8, 90, 100, true, false, 0.7);
 			RightDrive(setVelocity(-100, pct);)
 			LeftDrive(setVelocity(100, pct);)
 			RightDrive(spin(fwd);)
@@ -253,7 +211,7 @@ void pre_auton(void) {
 			DriveWithAngle(-8, -90, 100, true, false, 0.6);
 			TurnAt(-168, 100, true, false, 0.7);
 
-			robot.Intake.setVelocity(100, pct);
+			robot.Intake.setVelocity(56, pct);
 			DriveWithAngle(46.25, -170, 90, true, false, 1.3);
 			TurnAt(-21.5, 100, false, false, 0.65);
 			wait(0.5, sec);
@@ -296,7 +254,7 @@ void pre_auton(void) {
 			DriveWithAnglesAndSpeed({{4, {180, 12.5}}}, 100, false, false, 1, 0);
 			wait(0.25, sec);
 			ToggleLeftWing();
-			wait(5, sec);
+			wait(4, sec);
 			TurnAtPoint({0, -16}, false, 100, true, false, 1);
 			double heading = robot.Inertial.heading(deg);
 			ToggleBothWings();
@@ -314,7 +272,7 @@ void pre_auton(void) {
 			std::cout << "Distance (:" << distt << std::endl;
 	
 			ToggleBothWings();
-			DriveWithAngle(distt + 7.5, 180, 100, false, false, 1);
+			DriveWithAngle(distt + 6, 180, 100, false, false, 1);
 
 			wait(0.25, sec);
 
@@ -323,11 +281,11 @@ void pre_auton(void) {
 			wait(1.75, sec);
 			robot.Intake.setVelocity(0, pct);
 
-			DriveWithAnglesAndSpeed({{-6, {-90, 15}}, {-12, {-45, 15}}, {-15, {-45, 100}}, {-4, {-90, 15}}, {-10, {-90, 100}}  }, 100, true, false, 3);
+			DriveWithAnglesAndSpeed({{-6, {-90, 15}}, {-12, {-45, 15}}, {-10, {-45, 100}}, {-4, {-90, 15}}, {-8, {-90, 100}}, {-15, {20, 12}}}, 100, true, false, 3);
+			ToggleRightWing();
 
+			resetWings = false;
 
-			
-			
 			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
 		},
@@ -369,7 +327,7 @@ void pre_auton(void) {
 		"Disrupt."
 	});
 	
-	ms.SetTestAutonomous("Match", "Right", "Complex");
+	ms.SetTestAutonomous("Match", "Right", "Simple");
 
 	while(ms.should_update && (Competition.isFieldControl() || Competition.isCompetitionSwitch())){
 		ms.Update();
