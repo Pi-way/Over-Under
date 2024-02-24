@@ -48,9 +48,10 @@ void pre_auton(void) {
 
 			DriveWithAnglesAndSpeed({{-7, {42, 85}},{-8, {90, 25}},{-30, {90, 75}}}, 100, true, false, 1.5);
 			DriveWithAnglesAndSpeed(true, {{11, {75, 85}}}, 100, true, false, 1);
+			robot.RightWing.set(true);
 			TurnAtPoint({48, -6}, true, 100, false, false, 3);
 			wait(0.75, sec);
-			robot.RightWing.set(true);
+			
 			robot.LaunchCatapultFor((Competition.isFieldControl()) ? 50 : 1);
 
 			vex::task ball_set_up2 = vex::task([]()->int{
@@ -66,7 +67,7 @@ void pre_auton(void) {
 			DriveWithAngle(4, 180, 100, true, false, 0.8);
 			TurnAt(97, 100, true, false, 0.8);
 			ToggleRightWing();
-			DriveWithAnglesAndSpeed({{-80, {135, 75}}}, 100, true, false, 2.5);
+			DriveWithAnglesAndSpeed({{-80, {110, 75}}}, 100, true, false, 2.5);
 			ToggleRightWing();
 			TurnAt(0, 100, true, false, 0.8);
 
@@ -81,24 +82,102 @@ void pre_auton(void) {
 				{-5, {180, 50}},
 
 				{-15, {180, 50}}, //Align In Alley
-				{-62, {180, 100}}, //Alley Push
-				{-5, {180, 12}}, //Slow Down
+				{-60, {180, 90}}, //Alley Push
+				{-6, {180, 12}}, //Slow Down
 
-				{-5, {-135, 45}},
-				{-35, {-135, 50}},
+				{-6, {-142, 45}},
+				{-20.75, {-142, 50}},
 
-				{-5, {-100, 12}},
-				{-40, {-100, 100}},
-			}, 100, false, false, 8);
+				{-5, {-90, 45}},
+				{-40, {-90, 100}},
+			}, 100, false, false, 7);
 
 			wait(1, sec);
 			robot.MiniWing.set(true);
 			wait(1.5, sec);
 
-			DriveWithAngle(12, -90, 100, false, false, 1);
-			DriveWithAngle(-15, -90, 100, false, false, 1);
+			waitUntil(PIDsRunning < 1);
 
+			robot.MiniWing.set(false);
 
+			DriveWithAngle(8, -90, 100, true, false, 1);
+			DriveWithAngle(-15, -90, 100, true, false, 1);
+
+			DriveWithAnglesAndSpeed({{
+				{7, {-90, 100}},
+				{5, {-135, 30}},
+				{8, {-135, 100}},
+			}}, 100, true, false, 2.5);
+
+			TurnAt(-50, 100, true, false, 0.8);
+			
+
+			DriveWithAnglesAndSpeed({
+				{-10, {-45, 100}},
+				{-5, {-15, 25}},
+				{-12, {-15, 95}},
+
+				//Sharp Turn to face back to goal
+				{-3, {-45, 22}},
+				{-3, {-90, 22}},
+				{-3, {-135, 22}},
+				{-3, {180, 22}},
+
+				{-30, {180, 95}},
+			}, 100, false, false, 4);
+
+			wait(1, sec);
+
+			robot.LeftWing.set(true);
+
+			waitUntil(PIDsRunning < 1);
+
+			TurnAt(180, 100, true, false, 0.8);
+			robot.LeftWing.set(false);
+
+			//Drive Away from first push, facing match load station
+			DriveWithAngle(26, 180, 95, true, false, 1.3);
+			TurnAt(-90, 100, true, false, 0.8);
+
+			DriveWithAnglesAndSpeed({
+				{-10, {-90, 95}},
+				{-5, {-135, 25}},
+				{-5, {-135, 90}},
+				{-5, {135, 25}},
+				{-5, {135, 75}},
+			}, 100, false, false, 2.5);
+
+			wait(0.5, sec);
+			robot.LeftWing.set(true);
+			waitUntil(PIDsRunning < 1);
+			TurnAt(150, 100, true, false, 0.8);
+			robot.LeftWing.set(false);
+			robot.RightWing.set(true);
+
+			DriveWithAnglesAndSpeed({
+				{-7, {150, 80}},
+				{-5, {170, 60}},
+				{-30, {180, 80}},
+			}, 100 , true, false, 2.5);
+
+			//Turn to heading so wings dont get caught
+
+			TurnAt(180, 100, true, false, 0.8);
+			robot.RightWing.set(false);
+			DriveWithAngle(26, 180, 95, true, false, 1.25);
+			TurnAt(90, 100, true, false, 0.8);
+
+			DriveWithAnglesAndSpeed({
+				{-7, {135, 50}},
+				{-5, {180, 50}},
+				{-30, {180, 100}},
+			}, 100, false, false, 3);
+
+			wait(0.6, sec);
+			robot.RightWing.set(true);
+			robot.LeftWing.set(true);
+
+			std::cout << Brain.Timer.time(sec) - startTime << std::endl;
 		}, "Skills V2"
 	});
 
@@ -320,7 +399,7 @@ void pre_auton(void) {
 
 			robot.Intake.setVelocity(60, pct);
 			robot.Intake.spin(fwd);
-			DriveWithAngle(48, 101.81, 90, true, false, 2);
+			DriveWithAngle(48, 100, 91, true, false, 2);
 			robot.Intake.setVelocity(5, pct);
 
 			DriveWithAnglesAndSpeed({
@@ -351,7 +430,8 @@ void pre_auton(void) {
 			wait(2, sec);
 			robot.Intake.setVelocity(-100, pct);
 
-			DriveWithAngle(-6, 180, 100, true, false, 1);
+			DriveWithAngle(-20, 180, 100, true, false, 1.25);
+			DriveWithAngle(17, 180, 100, true, false, 1);
 
 			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
@@ -359,7 +439,7 @@ void pre_auton(void) {
 		"The new rush... with CHEESE!"
 	});
 	
-	ms.SetTestAutonomous("Match", "Left", "Winpoint");
+	ms.SetTestAutonomous("Skills", "Left", "Winpoint");
 
 	while(ms.should_update && (Competition.isFieldControl() || Competition.isCompetitionSwitch())){
 		ms.Update();
