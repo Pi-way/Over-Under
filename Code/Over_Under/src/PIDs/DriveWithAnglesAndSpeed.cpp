@@ -32,12 +32,16 @@ int _Drive_With_Angles_And_Speed_()
     task::yield();
   }
 
+  bool localShouldLetTurnSettle = shouldLetTurnSettle;
+
   bool NotDone = true;
   bool TurnNotDone = true;
-  bool TurnNotDoneFR = true;
   
-  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 100, &TurnNotDone, LocalTimeout, 0.125);
+  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, 100, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
+  PID BackupTurnPID = LocalTurnPID;
+
+  LocalPID.SpeedCap = LocalList[0].second.second;
 
   auto Encoder = robot.ForwardTrack.getObserver();
 
@@ -69,8 +73,10 @@ int _Drive_With_Angles_And_Speed_()
   
   LocalPID.Time = 0;
 
+  bool resetTurn = false;
+
   //main loop
-  while (NotDone || TurnNotDone)
+  while (NotDone || TurnNotDone) 
   {
     //record current time for delta time calculation
     LastTime = ThisTime;
@@ -97,11 +103,13 @@ int _Drive_With_Angles_And_Speed_()
     LastTurnError = TurnError;
     TurnError = wrapAngleDeg(LocalList[currentIndex].second.first - robot.Inertial.heading(degrees));
 
-    if(currentIndex + 1 == LocalList.size()) {
-      if(std::abs(TurnError) < 1){
-        TurnNotDoneFR = false;
-      }
+    if (localShouldLetTurnSettle && currentIndex+1 >= LocalList.size() && !resetTurn){
+      LocalTurnPID = BackupTurnPID;
+      TurnNotDone = true;
+      resetTurn = true;
+      std::cout << "yo bro just reset" << std::endl;
     }
+
 
     if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
     {
@@ -140,6 +148,30 @@ void DriveWithAnglesAndSpeed(std::vector<std::pair<double, std::pair<double, dou
   Coast = coast;
   CustomTimeout = coustom_timeout;
   SettleTime = coustom_settle;
+  shouldLetTurnSettle = false;
+
+  // Either wait for the function to complete, or run the function in a task
+  if (wait_for_completion)
+  {
+    _Drive_With_Angles_And_Speed_();
+  }
+  else
+  {
+    PIDTask = task(_Drive_With_Angles_And_Speed_);
+  }
+}
+
+// Wrapper function that will accept arguments for the main function (_Drive_())
+void DriveWithAnglesAndSpeed(bool _shouldLetTurnSettle, std::vector<std::pair<double, std::pair<double, double>>> List, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle)
+{
+
+  // Assign local variables to global variables
+  globalDistanceHeadingSpeedList = List;
+  Speed = speed;
+  Coast = coast;
+  CustomTimeout = coustom_timeout;
+  SettleTime = coustom_settle;
+  shouldLetTurnSettle = _shouldLetTurnSettle;
 
   // Either wait for the function to complete, or run the function in a task
   if (wait_for_completion)

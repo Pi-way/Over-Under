@@ -46,9 +46,13 @@ public:
 
   motor Intake = motor(WatchPort(PORT10), ratio6_1, true);
 
+  distance FrontDistance = distance(WatchPort(PORT15));
+  distance BackDistance = distance(WatchPort(PORT14));
+
   digital_out RightWing = digital_out(Brain.ThreeWirePort.A);
   digital_out LeftWing = digital_out(Brain.ThreeWirePort.B);
   digital_out SideElevation = digital_out(Brain.ThreeWirePort.E);
+  digital_out MiniWing = digital_out(Brain.ThreeWirePort.D);
 
 };
 
@@ -98,6 +102,7 @@ extern std::vector<std::pair<double, std::pair<double, double>>> globalDistanceH
 extern std::pair<double, double> Target;
 extern bool UseFront;
 
+extern double CatapultSpeed;
 extern double Distance;
 extern double Speed;
 extern bool Coast;
@@ -108,6 +113,7 @@ extern bool *NeverStopPtr;
 extern int PIDsRunning;
 extern double TurnDistance;
 extern vex::task PIDTask;
+extern bool shouldLetTurnSettle;
 
 extern PID TurnPID;
 
@@ -129,3 +135,5 @@ void TurnAtPoint(std::pair<double, double> target, bool use_front = true, double
 void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
 void DriveWithAnglesAndSpeed(std::vector<std::pair<double, std::pair<double, double>>> List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
+void DriveWithAnglesAndSpeed(bool shouldLetTurnSettle, std::vector<std::pair<double, std::pair<double, double>>> List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
+void DriveAgainstBarrier(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);

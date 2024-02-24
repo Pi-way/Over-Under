@@ -35,7 +35,7 @@ void Robot::LaunchCatapultFor(int n){
   int counter = 0;
   bool notDone = true;
 
-  robot.Cata.setVelocity(100, pct);
+  robot.Cata.setVelocity(CatapultSpeed, pct);
   robot.Cata.spin(fwd);
 
   while(counter < n + 1){
@@ -55,7 +55,9 @@ void Robot::LaunchCatapultFor(int n){
 }
 
 void Robot::LaunchCatapultUntilButtonPressed(){
-  robot.Cata.setVelocity(100, pct);
+  robot.Cata.setVelocity(CatapultSpeed, pct);
+  robot.Cata.spin(fwd);
+  robot.Intake.setVelocity(-100, pct);
   robot.Cata.spin(fwd);
   waitUntil(Controller.ButtonL1.pressing());
   robot.Cata.setVelocity(0, pct);
@@ -92,3 +94,4 @@ bool *FalsePtr = new bool(true);
 int PIDsRunning = 0;
 double TurnDistance;
 vex::task PIDTask;
+bool shouldLetTurnSettle = false;

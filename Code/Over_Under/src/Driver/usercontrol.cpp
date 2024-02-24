@@ -1,16 +1,48 @@
 #include "vex.h"
 using namespace vex;
 
+int TimersRunning = 0;
+bool DISABLED = false;
+void StartTimer(){
+  //TimersRunning ++;
+  //waitUntil(TimersRunning < 2);
+  auto timer_task = task([]()->int{
+    double startTime = Brain.Timer.value();
+    int time = 0;
+    while(time < 60){//TimersRunning < 2 && time < 60){
+      time = (int)std::floor(Brain.Timer.value() - startTime);
+      Controller.Screen.clearLine(3);
+      Controller.Screen.setCursor(3, 10);
+      Controller.Screen.print(60 - time);
+      clearConsole();
+      std::cout << std::floor(60.0 - (Brain.Timer.value() - startTime)) << std::endl;
+      wait(20, msec);
+    }
+    if (time >= 60){
+      DISABLED = true;
+    }
+    return 0;
+  });
+  Controller.rumble(".-.-.-");
+  //TimersRunning --;
+}
+
+double CatapultSpeed = 90;
 bool RunCata = false;
 void ToggleCatapult(){
   RunCata = !RunCata;
   robot.Cata.spin(fwd);
   if (RunCata) {
-    robot.Cata.setVelocity(100, pct);
+    robot.Cata.setVelocity(CatapultSpeed, pct);
+    if (ms.GetAlliance() == AllianceEnum::Skills){
+      StartTimer();
+    } 
   } else {
     robot.Cata.setVelocity(0, pct);
   }
 }
+
+
 
 void usercontrol(void) {
 
@@ -19,8 +51,8 @@ void usercontrol(void) {
   Brain.Screen.clearScreen();
 
   if (ms.GetAlliance() == AllianceEnum::Skills){
-			double st = Brain.Timer.time(sec);
-			odom.Calibrate(-50, -56.15, 46.27);
+      StartTimer();
+			odom.Calibrate(-50, -56.15, 50);
 			auto ODOM = new vex::task(updateOdometry);
 			robot.Inertial.setHeading(46.5, deg);
 
@@ -33,7 +65,7 @@ void usercontrol(void) {
 			});
 
 			DriveWithAnglesAndSpeed({{-7, {42, 85}},{-8, {90, 25}},{-30, {90, 75}}}, 100, true, false, 1.5);
-			DriveWithAnglesAndSpeed({{14.5, {60, 85}}}, 100, true, false, 1);
+			DriveWithAnglesAndSpeed(true, {{11, {75, 85}}}, 100, true, false, 1);
 			TurnAtPoint({48, -6}, true, 100, false, false, 3);
 			wait(0.75, sec);
 			robot.RightWing.set(true);
@@ -55,12 +87,13 @@ void usercontrol(void) {
   Controller.ButtonL2.pressed([](){ToggleBothWings();});
   Controller.ButtonB.pressed([](){ToggleRightWing();});
   Controller.ButtonDown.pressed([](){ToggleLeftWing();});
+  Controller.ButtonUp.pressed([](){robot.MiniWing.set(!robot.MiniWing.value());});
 
   double right;
   double left;
 
   double startTime = Brain.Timer.value();
-  while (true) {
+  while (true && !DISABLED) {
 
     //Drivetrain Control
     right = Controller.Axis2.position();
@@ -83,4 +116,7 @@ void usercontrol(void) {
 
     wait(20, msec);
   }
+  RightDrive(spin(forward, 0, pct);)
+  LeftDrive(spin(forward, 0, pct);)
+  robot.Intake.setVelocity(0, pct);
 }

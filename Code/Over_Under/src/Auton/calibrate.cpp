@@ -43,6 +43,7 @@ int Calibrate( bool inert)
         robot.LeftWing.set(false);
     }
     robot.SideElevation.set(false);
+    robot.MiniWing.set(false);
 
     return 0;
 };

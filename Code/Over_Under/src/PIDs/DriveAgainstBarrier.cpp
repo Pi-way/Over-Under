@@ -9,7 +9,7 @@
 
 #include "vex.h"
 
-int _Drive_With_Angle_()
+int _Drive_Against_Barrier_()
 {
     // Assign and declare local variables from global variables.
   double LocalDistance = Distance;
@@ -31,7 +31,7 @@ int _Drive_With_Angle_()
   bool TurnNotDone = true;
   
   PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 1000000);
+  PID LocalTurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 1000000);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -81,7 +81,7 @@ int _Drive_With_Angle_()
 }
 
 // Wrapper function that will accept arguments for the main function (_Drive_())
-void DriveWithAngle(double distance, double turn_target, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle, bool *never_stop_ptr)
+void DriveAgainstBarrier(double distance, double turn_target, double speed, bool wait_for_completion, bool coast, double coustom_timeout, double coustom_settle, bool *never_stop_ptr)
 {
 
   // Assign local variables to global variables
@@ -96,10 +96,10 @@ void DriveWithAngle(double distance, double turn_target, double speed, bool wait
   // Either wait for the function to complete, or run the function in a task
   if (wait_for_completion)
   {
-    _Drive_With_Angle_();
+    _Drive_Against_Barrier_();
   }
   else
   {
-    PIDTask = task(_Drive_With_Angle_);
+    PIDTask = task(_Drive_Against_Barrier_);
   }
 }
