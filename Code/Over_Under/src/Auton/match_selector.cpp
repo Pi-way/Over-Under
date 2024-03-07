@@ -285,14 +285,6 @@ void MatchSelector::Update()
     {
         ShowSelectionDescription();
     }
-
-    for(int i = 0; i < PortWatch.size(); i ++){
-       if(!PortWatch[i].installed()){
-            Controller.rumble("-");
-            std::cout<<"laisjdlkfjalsdf"<<std::endl;
-       }
-    }
-
 }
 
 void MatchSelector::ShowSelectionDescription()

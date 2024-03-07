@@ -24,14 +24,14 @@ int _Drive_With_Angle_()
 
   // Wait until other PIDs have completed
   while(PIDsRunning > 1){
-    task::yield();
+    wait(20, msec);
   }
 
   bool NotDone = true;
   bool TurnNotDone = true;
   
   PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 1000000);
+  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, 100, &TurnNotDone, 100000, 0.125);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -52,7 +52,9 @@ int _Drive_With_Angle_()
   RightDrive(spin(forward);)
   LeftDrive(spin(forward);)
 
-  while (NotDone && *NeverStopPtr)
+  double startTime = Brain.Timer.value();
+
+  while (NotDone && Brain.Timer.value() - startTime < LocalTimeout)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();

@@ -107,7 +107,6 @@ int _Drive_With_Angles_And_Speed_()
       LocalTurnPID = BackupTurnPID;
       TurnNotDone = true;
       resetTurn = true;
-      std::cout << "yo bro just reset" << std::endl;
     }
 
 

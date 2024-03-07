@@ -33,7 +33,6 @@ void pre_auton(void) {
 	ms.Assign("Skills", "Left", "Winpoint", new auton{
 		[](){
 			clearConsole();
-			double startTime = Brain.Timer.value();
 			odom.Calibrate(-50, -56.15, 50);
 			auto ODOM = new vex::task(updateOdometry);
 			robot.Inertial.setHeading(46.5, deg);
@@ -51,8 +50,12 @@ void pre_auton(void) {
 			robot.RightWing.set(true);
 			TurnAtPoint({48, -6}, true, 100, false, false, 3);
 			wait(0.75, sec);
+
+			robot.Intake.setVelocity(-100, pct);
 			
-			robot.LaunchCatapultFor((Competition.isFieldControl()) ? 50 : 1);
+			robot.LaunchCatapultFor(3);
+
+			double startTime = Brain.Timer.value();
 
 			vex::task ball_set_up2 = vex::task([]()->int{
 				robot.Cata.setBrake(coast);
@@ -62,8 +65,10 @@ void pre_auton(void) {
 				return 0;
 			});
 
-			DriveWithAnglesAndSpeed(true, {{20, {-20, 100}}, {7, {180, 10}}}, 100, true, false, 1.25);
+			DriveWithAnglesAndSpeed(true, {{20, {-10, 100}}, {7, {180, 10}}}, 100, true, false, 1.25);
+			robot.Intake.setVelocity(0, pct);
 			DriveWithAnglesAndSpeed({{-40, {200, 80}}}, 100, true, false, 1.25);
+			robot.Inertial.setHeading(180, deg);
 			DriveWithAngle(4, 180, 100, true, false, 0.8);
 			TurnAt(97, 100, true, false, 0.8);
 			ToggleRightWing();
@@ -72,7 +77,7 @@ void pre_auton(void) {
 			TurnAt(0, 100, true, false, 0.8);
 
 			DriveWithAnglesAndSpeed({
-				{-25, {4, 100}},
+				{-25, {6.75, 100}},
 
 				{-5, {90, 18}},
 				{-10, {90, 50}},
@@ -103,79 +108,139 @@ void pre_auton(void) {
 			DriveWithAngle(8, -90, 100, true, false, 1);
 			DriveWithAngle(-15, -90, 100, true, false, 1);
 
-			DriveWithAnglesAndSpeed({{
-				{7, {-90, 100}},
-				{5, {-135, 30}},
-				{8, {-135, 100}},
-			}}, 100, true, false, 2.5);
-
-			TurnAt(-50, 100, true, false, 0.8);
-			
+			//Done with pushes
 
 			DriveWithAnglesAndSpeed({
-				{-10, {-45, 100}},
-				{-5, {-15, 25}},
-				{-12, {-15, 95}},
+				{10, {-135, 45}},
+				{4, {-135, 75}},
+				{7, {-135, 100}},
+			},100, true, false, 1.25);
 
-				//Sharp Turn to face back to goal
-				{-3, {-45, 22}},
-				{-3, {-90, 22}},
-				{-3, {-135, 22}},
-				{-3, {180, 22}},
+			auto dist = GetDistance(odom.x, odom.y, 0, 36);
 
-				{-30, {180, 95}},
+			DriveWithAnglesAndSpeed({
+				{-10, {0, 40}},
+				{-(dist - 28), {0, 100}},
+				{-12, {-90, 20}},
+				{-15, {-90, 100}}
 			}, 100, false, false, 4);
 
-			wait(1, sec);
+			wait(3, sec);
+			robot.RightWing.set(true); robot.LeftWing.set(true);
+			waitUntil(PIDsRunning < 1);
 
-			robot.LeftWing.set(true);
+			//Now we pivot to face goal for first push
+
+			DriveWithAnglesAndSpeed({
+				{-7, {-164, 30}},
+				{-12, {-164, 100}}
+			}, 100, true, false, 4);
 
 			waitUntil(PIDsRunning < 1);
 
-			TurnAt(180, 100, true, false, 0.8);
-			robot.LeftWing.set(false);
+			// "pulse"
+			DriveWithAngle(-15, -164, 100, true, false, 0.7, 0);
+			DriveWithAngle(8, -165, 100, true, false, 0.7, 0);
+			DriveWithAngle(-15, -166, 100, true, false, 0.7, 0);
+			DriveWithAngle(8, -167, 100, true, false, 0.7, 0);
+			DriveWithAngle(-15, -168, 100, true, false, 0.7, 0);
 
-			//Drive Away from first push, facing match load station
-			DriveWithAngle(26, 180, 95, true, false, 1.3);
-			TurnAt(-90, 100, true, false, 0.8);
-
-			DriveWithAnglesAndSpeed({
-				{-10, {-90, 95}},
-				{-5, {-135, 25}},
-				{-5, {-135, 90}},
-				{-5, {135, 25}},
-				{-5, {135, 75}},
-			}, 100, false, false, 2.5);
-
-			wait(0.5, sec);
-			robot.LeftWing.set(true);
-			waitUntil(PIDsRunning < 1);
-			TurnAt(150, 100, true, false, 0.8);
-			robot.LeftWing.set(false);
-			robot.RightWing.set(true);
 
 			DriveWithAnglesAndSpeed({
-				{-7, {150, 80}},
-				{-5, {170, 60}},
-				{-30, {180, 80}},
-			}, 100 , true, false, 2.5);
-
-			//Turn to heading so wings dont get caught
-
-			TurnAt(180, 100, true, false, 0.8);
-			robot.RightWing.set(false);
-			DriveWithAngle(26, 180, 95, true, false, 1.25);
-			TurnAt(90, 100, true, false, 0.8);
+				{20, {-170, 100}},
+				{5, {-90, 20}}
+			}, 100, true, false, 1.5);
 
 			DriveWithAnglesAndSpeed({
-				{-7, {135, 50}},
-				{-5, {180, 50}},
-				{-30, {180, 100}},
-			}, 100, false, false, 3);
+				
+			})
 
-			wait(0.6, sec);
-			robot.RightWing.set(true);
-			robot.LeftWing.set(true);
+			// ############# OLD CODE ###################
+
+			// DriveWithAnglesAndSpeed({{
+			// 	{7, {-90, 100}},
+			// 	{5, {-135, 30}},
+			// 	{8, {-135, 100}},
+			// }}, 100, true, false, 2.5);
+
+			// TurnAt(-50, 100, true, false, 0.8);
+			
+
+			// DriveWithAnglesAndSpeed({
+			// 	{-10, {-45, 100}},
+			// 	{-5, {-15, 25}},
+			// 	{-12, {-15, 95}},
+
+			// 	//Sharp Turn to face back to goal
+			// 	{-3.25, {-45, 27}},
+			// 	{-3.25, {-90, 27}},
+			// 	{-3.25, {-135, 27}},
+			// 	{-3.25, {180, 27}},
+
+			// 	{-40, {180, 95}},
+			// }, 100, false, false, 4);
+
+			// wait(1, sec);
+
+			// robot.LeftWing.set(true);
+
+			// waitUntil(PIDsRunning < 1);
+
+			// robot.LeftWing.set(false);
+
+			// //Drive Away from first push, facing match load station
+			// DriveWithAngle(26, 180, 95, true, false, 1.3);
+			// TurnAt(-90, 100, true, false, 0.8);
+
+			// robot.Intake.setVelocity(-100, pct);
+
+			// DriveWithAnglesAndSpeed({
+			// 	{-10, {-90, 95}},
+			// 	{-5, {-135, 25}},
+			// 	{-5, {-135, 90}},
+			// 	{-5, {135, 25}},
+			// 	{-5, {135, 75}},
+			// }, 100, false, false, 2.5);
+
+			// wait(0.5, sec);
+			// robot.LeftWing.set(true);
+			// waitUntil(PIDsRunning < 1);
+			// TurnAt(150, 100, true, false, 0.8);
+			// robot.LeftWing.set(false);
+			// robot.RightWing.set(true);
+
+			// DriveWithAnglesAndSpeed({
+			// 	{-4, {150, 80}},
+			// 	{-3, {170, 30}},
+			// 	{-40, {180, 80}},
+			// }, 100 , true, false, 2.5);
+
+			// robot.RightWing.set(false);
+
+			// robot.Intake.setVelocity(0, pct);
+
+			// DriveWithAngle(26, 180, 95, true, false, 1.25);
+
+			// TurnAtPoint({24, 0}, false, 100, true, false, 1);
+
+			// robot.LeftWing.set(true);
+			// robot.RightWing.set(true);
+
+			// double angleBro = robot.Inertial.heading(deg);
+
+			// DriveWithAnglesAndSpeed({
+			// 	{-5, {angleBro, 95}},
+			// 	{-3, {180, 25}},
+			// 	{-7, {180, 75}},
+			// 	{-30, {180, 100}},
+			// }, 100, true, false, 2);
+
+			// robot.Intake.setVelocity(-100, pct);
+
+			// robot.LeftWing.set(false);
+			// robot.RightWing.set(false);
+			// DriveWithAngle(12, 180, 100, true, false, 1);
+
 
 			std::cout << Brain.Timer.time(sec) - startTime << std::endl;
 		}, "Skills V2"
@@ -331,8 +396,8 @@ void pre_auton(void) {
 			wait(0.25, sec);
 			DriveWithAngle(3, 180, 100, true, false, 0.3);
 
-			DriveWithAngle(-25, 180, 100, true, false, 1);
-			DriveWithAnglesAndSpeed({{-22, {135, 50}}}, 100, false, false, 0.9);
+			DriveWithAngle(-26, 180, 100, true, false, 1);
+			DriveWithAnglesAndSpeed({{-22, {135, 75}}}, 100, false, false, 0.9, 0);
 			vex::task ball_set_up_2 = vex::task([]()->int{
 				robot.Cata.setBrake(coast);
 				wait(1, sec);
@@ -344,8 +409,8 @@ void pre_auton(void) {
 			wait(0.75, sec);
 			robot.LeftWing.set(false);
 			wait(0.125, sec);
-			DriveWithAnglesAndSpeed({{-6, {90, 50}}, {-18, {90, 100}}}, 100, true, false, 1.2);
-			DriveWithAngle(8, 90, 100, true, false, 0.7);
+			DriveWithAnglesAndSpeed({{-6, {90, 50}}, {-18, {90, 100}}}, 100, true, false, 1, 0);
+			DriveWithAngle(8, 90, 100, true, false, 0.7, 0);
 			RightDrive(setVelocity(-100, pct);)
 			LeftDrive(setVelocity(100, pct);)
 			RightDrive(spin(fwd);)
@@ -359,31 +424,31 @@ void pre_auton(void) {
 
 			robot.Intake.setVelocity(-100, pct);
 			wait(0.25, sec);
-			DriveWithAngle(24, -90, 100, true, false, 0.8);
-			DriveWithAngle(-8, -90, 100, true, false, 0.6);
-			TurnAt(-168, 100, true, false, 0.7);
+			DriveWithAngle(24, -90, 100, true, false, 0.8, 0);
+			DriveWithAngle(-10, -90, 100, true, false, 0.6, 0);
+			TurnAt(-165, 100, true, false, 0.7, 0);
 
 			robot.Intake.setVelocity(56, pct);
-			DriveWithAngle(46.25, -170, 90, true, false, 1.3);
-			TurnAt(-21.5, 100, false, false, 0.65);
+			DriveWithAngle(46.25, -170, 90, true, false, 1.3, 0);
+			TurnAt(-21.5, 100, false, false, 0.65, 0);
 			wait(0.5, sec);
 			robot.Intake.setVelocity(0, pct);
-			DriveWithAngle(12, -21.5, 100, false, false, 0.9);
+			DriveWithAngle(12, -21.5, 100, false, false, 0.9, 0);
 			wait(0.5, sec);
 			robot.Intake.setVelocity(-100, pct);
-			TurnAt(-135, 100, true, false, 0.9);
-			DriveWithAngle(20, -135, 100, false, false, 0.9);
+			TurnAt(-135, 100, true, false, 0.9, 0);
+			DriveWithAngle(20, -135, 100, false, false, 0.9, 0);
 			robot.Intake.setVelocity(100, pct);
 			wait(0.75, sec);
 			robot.Intake.setVelocity(0, pct);
-			DriveWithAnglesAndSpeed({{12, {180, 50}}}, 100, true, false, 0.5);
+			DriveWithAnglesAndSpeed({{12, {180, 50}}}, 100, true, false, 0.5, 0);
 			robot.RightWing.set(true);
 			robot.LeftWing.set(true);
-			DriveWithAngle(-40, 180, 100, false, false, 1.1);
+			DriveWithAngle(-40, 180, 100, false, false, 1.1, 0);
 			wait(0.5, sec);
 			robot.Intake.setVelocity(-50, pct);
 			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
-			DriveWithAngle(12, 180, 100, true, false, 0.75);
+			DriveWithAngle(12, 180, 100, true, false, 0.75, 0);
 			printf(" %3.3f\n", Brain.Timer.time(sec) - st);
 
 		},
@@ -419,10 +484,10 @@ void pre_auton(void) {
 			
 
 			DriveWithAnglesAndSpeed({
-				{1.25, {-45, 17.5}},
-				{1.25, {-90, 17.5}},
-				{1.25, {-135, 17.5}},
-				{1.25, {180, 17.5}},
+				{1.45, {-45, 19}},
+				{1.45, {-90, 19}},
+				{1.45, {-135, 19}},
+				{1.45, {180, 19}},
 				{49, {180, 75}},
 			}, 100, false, false, 4);
 			robot.LeftWing.set(false);
