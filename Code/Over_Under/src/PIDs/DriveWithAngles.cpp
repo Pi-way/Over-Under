@@ -35,9 +35,9 @@ int _Drive_With_Angles_()
   bool NotDone = true;
   bool TurnNotDone = true;
   bool TurnNotDoneFR = true;
-  
-  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 100, &TurnNotDone, 1000000, 0.125);
+
+  PID LocalPID(0.85, 0.1, 0.06, 50, 2, 3, LocalSpeed/100.0*12.0, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(0.2, 0.1, 0.015, 50, 5, 6, 12, &TurnNotDone, 1000000, 0.125);
 
   auto Encoder = robot.ForwardTrack.getObserver();
 
@@ -83,8 +83,8 @@ int _Drive_With_Angles_()
     RequestedRight = (OutputSpeed - TurnOutputSpeed);
     RequestedLeft = (OutputSpeed + TurnOutputSpeed);
 
-    RightDrive(setVelocity(RequestedRight, pct);)
-    LeftDrive(setVelocity(RequestedLeft, pct);)
+    RightDrive(spin(fwd, RequestedRight + (0.75 * GetSign(RequestedRight)), voltageUnits::volt);)
+    LeftDrive(spin(fwd, RequestedLeft, voltageUnits::volt);)
 
     wait(50, msec);
 
@@ -117,8 +117,8 @@ int _Drive_With_Angles_()
   delete Encoder;
 
   //stop the motors
-  RightDrive(setVelocity(0, pct);)
-  LeftDrive(setVelocity(0, pct);)
+  RightDrive(stop();)
+  LeftDrive(stop();)
 
   PIDsRunning -= 1;
 

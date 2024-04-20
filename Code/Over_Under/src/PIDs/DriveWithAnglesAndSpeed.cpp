@@ -19,7 +19,7 @@ int _Drive_With_Angles_And_Speed_()
 
   double localTurnDistance = LocalList[0].second.first;
 
-  double LocalSpeed = Speed;
+  double LocalSpeed = Speed / 100.0 * 12.0;
   bool LocalCoast = Coast;
   double LocalTimeout = CustomTimeout;
   double LocalSettle = SettleTime;
@@ -37,8 +37,8 @@ int _Drive_With_Angles_And_Speed_()
   bool NotDone = true;
   bool TurnNotDone = true;
   
-  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, 100, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
+  PID LocalPID(0.85, 0.1, 0.06, 50, 2, 3, 12, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(0.275, 0.1, 0.025, 75, 5, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
   PID BackupTurnPID = LocalTurnPID;
 
   LocalPID.SpeedCap = LocalList[0].second.second;
@@ -91,11 +91,11 @@ int _Drive_With_Angles_And_Speed_()
     RequestedRight = (OutputSpeed - TurnOutputSpeed);
     RequestedLeft = (OutputSpeed + TurnOutputSpeed);
 
-    RightDrive(setVelocity(RequestedRight, pct);)
-    LeftDrive(setVelocity(RequestedLeft, pct);)
+    RightDrive(spin(fwd, RequestedRight + (1 * GetSign(RequestedRight)), voltageUnits::volt);)
+    LeftDrive(spin(fwd, RequestedLeft, voltageUnits::volt);)
 
     wait(50, msec);
-
+    
     //calculate horizontal and heading error
     Error = LocalDistance - Encoder->position();
 
@@ -115,7 +115,7 @@ int _Drive_With_Angles_And_Speed_()
       if(currentIndex + 1 < LocalList.size()){
         currentIndex ++;
         DrivePos = Encoder->position();
-        LocalPID.SpeedCap = LocalList[currentIndex].second.second;
+        LocalPID.SpeedCap = LocalList[currentIndex].second.second / 100.0 * 12.0;
       }
       else
       {
@@ -127,10 +127,11 @@ int _Drive_With_Angles_And_Speed_()
   delete Encoder;
 
   //stop the motors
-  RightDrive(setVelocity(0, pct);)
-  LeftDrive(setVelocity(0, pct);)
+  RightDrive(stop();)
+  LeftDrive(stop();)
 
   PIDsRunning -= 1;
+  wait(20, msec);
 
   return 0;
 

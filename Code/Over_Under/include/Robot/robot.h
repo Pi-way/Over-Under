@@ -13,12 +13,6 @@ extern std::vector<vex::device> PortWatch;
 int32_t WatchPort(int32_t port);
 
 class Robot{
-private:
-
-  bool not_done = true;
-
-  PID catapult_PID = PID(0, 0, 0, 0, 0, 10, 360, &not_done, 0, 0); //Changing this does nothing, change in Robot::LaunchCatapult()
-
 public:
 
   Robot();
@@ -28,31 +22,32 @@ public:
   void LaunchCatapultFor(int n);
   void LaunchCatapultUntilButtonPressed();
 
-  motor FR = motor(WatchPort(PORT6), ratio6_1, false);
-  motor FL = motor(WatchPort(PORT3), ratio6_1, true);
+  motor FR = motor(WatchPort(PORT1), ratio6_1, false);
+  motor FL = motor(WatchPort(PORT5), ratio6_1, true);
 
-  motor BR = motor(WatchPort(PORT5), ratio6_1, true);
-  motor BL = motor(WatchPort(PORT2), ratio6_1, false);
+  motor BR = motor(WatchPort(PORT2), ratio6_1, true);
+  motor BL = motor(WatchPort(PORT6), ratio6_1, false);
 
-  motor BBR = motor(WatchPort(PORT4), ratio6_1, false);
-  motor BBL = motor(WatchPort(PORT1), ratio6_1, true);
+  motor BBR = motor(WatchPort(PORT3), ratio6_1, false);
+  motor BBL = motor(WatchPort(PORT7), ratio6_1, true);
 
-  rotation catapult_rotation = rotation(WatchPort(PORT8), false);
-  motor Cata = motor(WatchPort(PORT7), ratio18_1, false);
+  rotation catapult_rotation = rotation(WatchPort(PORT13), false);
+  motor Cata = motor(WatchPort(PORT14), ratio18_1, false);
 
-  TrackingWheel ForwardTrack = TrackingWheel(rotation(WatchPort(PORT12)), 2.75, false);
-  TrackingWheel StrafeTrack = TrackingWheel(rotation(WatchPort(PORT11)), 2.75, false);
-  inertial Inertial = inertial(WatchPort(PORT13));
+  TrackingWheel ForwardTrack = TrackingWheel(rotation(WatchPort(PORT17), true), 2.75, false);
+  inertial Inertial = inertial(WatchPort(PORT9));
 
-  motor Intake = motor(WatchPort(PORT10), ratio6_1, true);
+  motor Intake = motor(WatchPort(PORT8), ratio18_1, true);
 
-  distance FrontDistance = distance(WatchPort(PORT15));
-  distance BackDistance = distance(WatchPort(PORT14));
+  digital_out RightWing = digital_out(Brain.ThreeWirePort.D);
+  digital_out LeftWing = digital_out(Brain.ThreeWirePort.E);
+  digital_out RightBackWing = digital_out(Brain.ThreeWirePort.F);
+  digital_out LeftBackWing = digital_out(Brain.ThreeWirePort.G);
 
-  digital_out RightWing = digital_out(Brain.ThreeWirePort.A);
-  digital_out LeftWing = digital_out(Brain.ThreeWirePort.B);
-  digital_out SideElevation = digital_out(Brain.ThreeWirePort.E);
-  digital_out MiniWing = digital_out(Brain.ThreeWirePort.D);
+  digital_out LiftRatchet = digital_out(Brain.ThreeWirePort.B);
+  inertial LiftInertial = inertial(WatchPort(PORT12));
+  motor BigElevate = motor(WatchPort(PORT11), ratio36_1, false);
+  motor SmallElevate = motor(WatchPort(PORT18), ratio18_1, false);
 
 };
 
@@ -82,7 +77,6 @@ void autonomous();
 void pre_auton();
 
 extern Robot robot;
-extern Odometry odom;
 extern MatchSelector ms;
 extern task msTask;
 
@@ -130,10 +124,12 @@ extern bool left_wing_open;
 void ToggleBothWings();
 void ToggleRightWing();
 void ToggleLeftWing();
-void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2, bool start_at_100 = false);
-void TurnAtPoint(std::pair<double, double> target, bool use_front = true, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 2.0, double coustom_settle = 0.2);
+void ToggleBothBackWings();
+void ToggleRightBackWing();
+void ToggleLeftBackWing();
+
+void TurnAt(double amount, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 1.0, double coustom_settle = 0.2, bool start_at_100 = false);
 void DriveWithAngle(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);
 void DriveWithAngles(distanceHeadingList List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
 void DriveWithAnglesAndSpeed(std::vector<std::pair<double, std::pair<double, double>>> List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
 void DriveWithAnglesAndSpeed(bool shouldLetTurnSettle, std::vector<std::pair<double, std::pair<double, double>>> List, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4555.0, double coustom_settle = 0.125);
-void DriveAgainstBarrier(double distance, double turn_target, double speed = 100, bool wait_for_completion = true, bool coast = false, double coustom_timeout = 4.0, double coustom_settle = 0.2, bool *never_stop_ptr = FalsePtr);

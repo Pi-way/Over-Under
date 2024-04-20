@@ -29,9 +29,9 @@ int _Drive_With_Angle_()
 
   bool NotDone = true;
   bool TurnNotDone = true;
-  
-  PID LocalPID(14.75*0.5, 0.5, 0.1, 200, 25, 4, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(1.3 * 0.5, 0.002, 0.01, 200, 10, 6, 100, &TurnNotDone, 100000, 0.125);
+
+  PID LocalPID(0.85, 0.1, 0.06, 50, 2, 3, LocalSpeed/100.0*12.0, &NotDone, LocalTimeout, LocalSettle);
+  PID LocalTurnPID(0.2, 0.1, 0.015, 50, 5, 6, 12, &TurnNotDone, 100000, 0.125);
 
   RightDrive(setPosition(0, deg);)
   LeftDrive(setPosition(0, deg);)
@@ -45,6 +45,9 @@ int _Drive_With_Angle_()
   double TurnError = wrapAngleDeg(LocalTurnDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
   double TurnCorrectionSpeed = 0;
+
+  double RequestedRight;
+  double RequestedLeft;
 
   double ThisTime = Brain.Timer.systemHighResolution();
   double LastTime = ThisTime;
@@ -65,16 +68,19 @@ int _Drive_With_Angle_()
     OutputSpeed = LocalPID.Update(Error, (ThisTime - LastTime)/1000000.0);
     TurnCorrectionSpeed = LocalTurnPID.Update(TurnError, (ThisTime - LastTime)/1000000.0);
 
-    RightDrive(setVelocity(OutputSpeed - TurnCorrectionSpeed, pct);)
-    LeftDrive(setVelocity(OutputSpeed + TurnCorrectionSpeed, pct);)
+    RequestedRight = (OutputSpeed - TurnCorrectionSpeed);
+    RequestedLeft = (OutputSpeed + TurnCorrectionSpeed);
+
+    RightDrive(spin(fwd, RequestedRight + (0.75 * GetSign(RequestedRight)), voltageUnits::volt);)
+    LeftDrive(spin(fwd, RequestedLeft, voltageUnits::volt);)
 
     wait(20, msec);
   }
 
   delete Encoder;
 
-  RightDrive(setVelocity(0, pct);)
-  LeftDrive(setVelocity(0, pct);)
+  RightDrive(stop();)
+  LeftDrive(stop();)
 
   PIDsRunning -= 1;
 

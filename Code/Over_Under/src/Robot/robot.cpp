@@ -1,10 +1,7 @@
 #include "vex.h"
 using namespace vex;
 
-bool letrun = true;
-
 Robot::Robot() {
-    catapult_PID.HasRampedUp = true;
 }
 
 void ToggleRightWing() {
@@ -22,6 +19,24 @@ void ToggleBothWings() {
   } else {
     robot.RightWing.set(true);
     robot.LeftWing.set(true);
+  }
+}
+
+void ToggleRightBackWing() {
+  robot.RightBackWing.set(!robot.RightBackWing.value());
+}
+
+void ToggleLeftBackWing() {
+  robot.LeftBackWing.set(!robot.LeftBackWing.value());
+}
+
+void ToggleBothBackWings() {
+  if (robot.RightBackWing.value() || robot.LeftBackWing.value()) {
+    robot.RightBackWing.set(false);
+    robot.LeftBackWing.set(false);
+  } else {
+    robot.RightBackWing.set(true);
+    robot.LeftBackWing.set(true);
   }
 }
 
@@ -73,11 +88,8 @@ competition Competition;
 brain Brain;
 controller Controller;
 Robot robot;
-PurePursuitRobot PureRobot;
-Odometry odom;
 MatchSelector ms;
 task msTask;
-bool UseFront;
 
 distanceHeadingList globalDistanceHeadingList;
 std::vector<std::pair<double, std::pair<double, double>>> globalDistanceHeadingSpeedList;
@@ -93,5 +105,5 @@ bool *NeverStopPtr;
 bool *FalsePtr = new bool(true);
 int PIDsRunning = 0;
 double TurnDistance;
-vex::task PIDTask;
 bool shouldLetTurnSettle = false;
+vex::task PIDTask;

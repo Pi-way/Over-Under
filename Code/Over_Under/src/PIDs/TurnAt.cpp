@@ -32,7 +32,7 @@ int _Turn_At_()
   
   bool NotDone = true;
 
-  TurnPID = PID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, LocalSpeed, &NotDone, LocalTimeout, LocalSettle);
+  PID TurnPID(0.275, 0.1, 0.025, 75, 5, 6, LocalSpeed/100.0*12.0, &NotDone, LocalTimeout, LocalSettle);
 
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
@@ -50,15 +50,15 @@ int _Turn_At_()
     TurnPID.HasRampedUp = true;
     TurnPID.RampUp = 1000000;
   }
-  
+
   while (NotDone)
   {
     LastTime = ThisTime;
     ThisTime = Brain.Timer.systemHighResolution();
     OutputSpeed = TurnPID.Update(Error, (ThisTime - LastTime)/1000000.0);
 
-    RightDrive(setVelocity(-OutputSpeed, pct);)
-    LeftDrive(setVelocity(OutputSpeed, pct);)
+    RightDrive(spin(fwd, -OutputSpeed + (0.75 * GetSign(-OutputSpeed)), voltageUnits::volt);)
+    LeftDrive(spin(fwd, OutputSpeed, voltageUnits::volt);)
 
     wait(50, msec);
 
@@ -66,8 +66,8 @@ int _Turn_At_()
 
   }
 
-  RightDrive(setVelocity(0, pct);)
-  LeftDrive(setVelocity(0, pct);)
+  RightDrive(stop();)
+  LeftDrive(stop();)
 
   PIDsRunning -= 1;
 

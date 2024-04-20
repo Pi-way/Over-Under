@@ -17,16 +17,11 @@
 
 #include "util.h"
 #include "Robot/tracking_wheel.h"
-#include "Robot/odometry.h"
 #include "Auton/Calibrate.h"
 #include "Auton/match_selector.h"
 #include "Robot/robot.h"
 
-#include "PurePursuit/PurePursuitFunctions.h"
-#include "PurePursuit/PurePursuit.h"
-
 #include "Auton/PID.h"
-
 
 #define waitUntil(condition)                                                   \
   do {                                                                         \

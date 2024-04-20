@@ -5,6 +5,6 @@
 	"CodeGPT.apiKey": "CodeGPT Plus Beta",
 	"editor.fontSize": 14,
 	"C_Cpp.errorSquiggles": "disabled",
-	"editor.fontWeight": "300",
-	"terminal.integrated.fontSize": 13
+	"editor.fontWeight": "500",
+	"terminal.integrated.fontSize": 14
 }

@@ -37,7 +37,83 @@ void ToggleCatapult(){
   }
 }
 
-bool shouldHold = false;
+void SetLiftForCTier(){
+
+  robot.BigElevate.setVelocity(-100, pct);
+  robot.SmallElevate.setVelocity(-100, pct);
+  robot.LiftRatchet.set(true);
+  wait(0.1, sec);
+
+  orientationType axis;
+  double c_tier_position = 30;
+  double last_error;
+  double vel;
+
+  if(std::abs(robot.LiftInertial.orientation(orientationType::pitch, deg)) > std::abs(robot.LiftInertial.orientation(orientationType::roll, deg))){
+    axis = orientationType::pitch;
+  } else {
+    axis = orientationType::roll;
+  }
+
+  double error = wrapAngleDeg(c_tier_position - robot.LiftInertial.orientation(axis, deg));
+
+  while (true) {
+
+    last_error = error;
+    error = wrapAngleDeg(c_tier_position - robot.LiftInertial.orientation(axis, deg));
+    vel = error * 20;
+    robot.BigElevate.setVelocity(vel, pct);
+    robot.SmallElevate.setVelocity(vel, pct);
+
+    if (GetSign(error) != GetSign(last_error)) {
+      robot.BigElevate.setVelocity(0, pct);
+      robot.SmallElevate.setVelocity(0, pct);
+      return;
+    }
+    wait(20, msec);
+  }
+}
+        
+
+void LiftTask(){
+  task Task = task([]()->int{
+
+    robot.BigElevate.setStopping(hold);
+    robot.SmallElevate.setStopping(hold);
+    
+    while (true) {
+      if (Controller.ButtonUp.pressing()) {
+
+        robot.BigElevate.setVelocity(-100, pct);
+        robot.SmallElevate.setVelocity(-100, pct);
+        robot.LiftRatchet.set(true);
+        wait(0.1, sec);
+        robot.BigElevate.setVelocity(100, pct);
+        robot.SmallElevate.setVelocity(100, pct);
+        waitUntil(!Controller.ButtonUp.pressing());
+
+      } else if (Controller.ButtonDown.pressing()) {
+          
+        robot.LiftRatchet.set(false);
+        robot.BigElevate.setVelocity(-100, pct);
+        robot.SmallElevate.setVelocity(-100, pct);
+
+      } else if (Controller.ButtonX.pressing()) {
+
+        SetLiftForCTier();
+
+      } else {
+
+        robot.LiftRatchet.set(false);
+        robot.BigElevate.setVelocity(0, pct);
+        robot.SmallElevate.setVelocity(0, pct);
+
+      }
+      wait(20, msec);
+    }
+    return 0;
+  });
+}
 
 void usercontrol(void) {
 
@@ -45,58 +121,54 @@ void usercontrol(void) {
   ms.should_update = false;
   Brain.Screen.clearScreen();
 
+  // Auto Driver Control Code
   if (ms.GetAlliance() == AllianceEnum::Skills){
       StartTimer();
       clearConsole();
-			odom.Calibrate(-50, -56.15, 50);
-			auto ODOM = new vex::task(updateOdometry);
-			robot.Inertial.setHeading(46.5, deg);
-
-			vex::task ball_set_up = vex::task([]()->int{
-        robot.Intake.setVelocity(100, pct);
-        robot.Intake.spin(fwd);
-        wait(0.25, sec);
-        robot.Intake.setVelocity(0, pct);
-        return 0;
-			});
-
-			DriveWithAnglesAndSpeed({{-7, {42, 85}},{-8, {90, 25}},{-30, {90, 75}}}, 100, true, false, 1.5);
-			DriveWithAnglesAndSpeed(true, {{11, {75, 85}}}, 100, true, false, 1);
-			robot.RightWing.set(true);
-			TurnAtPoint({48, -6}, true, 100, false, false, 3);
-			wait(0.75, sec);
-			robot.LaunchCatapultUntilButtonPressed();
-      robot.Intake.setVelocity(-100, pct);
-
-			vex::task ball_set_up2 = vex::task([]()->int{
-				robot.Cata.setBrake(coast);
-				robot.RightWing.set(false);
-				wait(0.5, sec);
-				robot.Cata.setBrake(coast);
-				return 0;
-			});
-
   }
 
   robot.Cata.setBrake(coast); 
 
-  Controller.ButtonL1.pressed([](){ToggleCatapult();}); 
-  Controller.ButtonL2.pressed([](){ToggleBothWings();});
-  Controller.ButtonB.pressed([](){ToggleRightWing();});
-  Controller.ButtonDown.pressed([](){ToggleLeftWing();});
-  Controller.ButtonUp.pressed([](){robot.MiniWing.set(!robot.MiniWing.value());});
+  Controller.ButtonL1.pressed(ToggleBothWings);
+  Controller.ButtonA.pressed(ToggleRightWing);
+  Controller.ButtonY.pressed(ToggleLeftWing);
 
-  double right;
-  double left;
+  Controller.ButtonL2.pressed(ToggleBothBackWings);
+  Controller.ButtonRight.pressed(ToggleRightBackWing);
+  Controller.ButtonLeft.pressed(ToggleLeftBackWing);
+
+  double max_turn_vel = 75;
+
+  double right_vel;
+  double left_vel;
+  double target_right_vel;
+  double target_left_vel;
+  double target_turn_vel;
+  double avg_speed;
 
   double startTime = Brain.Timer.value();
+
+  LiftTask();
+
   while (true && !DISABLED) {
 
-    //Drivetrain Control
-    right = Controller.Axis2.position();
-    left = Controller.Axis3.position();
-    RightDrive(spin(forward, (right/100.0) * 12.0, volt);)
-    LeftDrive(spin(forward, (left/100.0) * 12.0, volt);)
+    target_right_vel = Controller.Axis2.position();
+    target_left_vel = Controller.Axis3.position();
+
+    target_turn_vel = (target_right_vel - target_left_vel) * 0.5;
+    avg_speed = (target_left_vel + target_right_vel) * 0.5;
+
+    if (std::abs(target_turn_vel) > max_turn_vel) {
+        right_vel = avg_speed + (max_turn_vel * 0.5 * GetSign(target_turn_vel));
+        left_vel = avg_speed - (max_turn_vel * 0.5 * GetSign(target_turn_vel));
+    }
+    else {
+        right_vel = target_right_vel;
+        left_vel = target_left_vel;
+    }
+
+    RightDrive(setVelocity(right_vel, pct);)
+    LeftDrive(setVelocity(left_vel, pct);)
 
     //Intake Control
     if (Controller.ButtonR1.pressing()) {
@@ -107,20 +179,6 @@ void usercontrol(void) {
       robot.Intake.setVelocity(0, pct);
     }
 
-    if (Controller.ButtonA.pressing() && Controller.ButtonRight.pressing()){
-      robot.SideElevation.set(true);
-      shouldHold = true;
-    }
-
-    clearConsole();
-
-    if (std::abs(robot.Inertial.pitch(deg)) > 3 || shouldHold){
-      RightDrive(setBrake(brake);)
-      LeftDrive(setBrake(brake);)
-    } else {
-      RightDrive(setBrake(coast);)
-      LeftDrive(setBrake(coast);)
-    }
     wait(20, msec);
   }
   RightDrive(spin(forward, 0, pct);)
