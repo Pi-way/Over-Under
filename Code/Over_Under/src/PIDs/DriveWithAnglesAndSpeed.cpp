@@ -10,11 +10,6 @@ int _Drive_With_Angles_And_Speed_()
 
   double LocalDistance = 0;
 
-  for(auto indicies = LocalList.begin(); indicies != LocalList.end(); indicies++ )
-  {
-    LocalDistance += indicies->first;
-  }
-
   int currentIndex = 0;
 
   double localTurnDistance = LocalList[0].second.first;
@@ -35,10 +30,12 @@ int _Drive_With_Angles_And_Speed_()
   bool localShouldLetTurnSettle = shouldLetTurnSettle;
 
   bool NotDone = true;
+  bool DummyTurnNotDone = true;
   bool TurnNotDone = true;
   
   PID LocalPID(0.85, 0.1, 0.06, 50, 2, 3, 12, &NotDone, LocalTimeout, LocalSettle);
-  PID LocalTurnPID(0.275, 0.1, 0.025, 75, 5, 6, LocalSpeed, &TurnNotDone, LocalTimeout, 0.125);
+  PID BackupLocalPID = LocalPID;
+  PID LocalTurnPID(0.275, 0.1, 0.025, 75, 5, 6, LocalSpeed, (LocalList.size() == 1) ? &TurnNotDone: &DummyTurnNotDone, LocalTimeout, 0.125);
   PID BackupTurnPID = LocalTurnPID;
 
   LocalPID.SpeedCap = LocalList[0].second.second;
@@ -50,10 +47,20 @@ int _Drive_With_Angles_And_Speed_()
 
   double DrivePos = 0;
 
-  double SmallError = LocalList[currentIndex].first - (Encoder->position() - DrivePos);
+  double DistanceUntilSignChange = 0;
+  int FirstDistanceSign = GetSign(LocalList[currentIndex].first);
+  int LastFirstDistanceSign = FirstDistanceSign;
 
-  //calculate initial horizontal and heading error using drivetrain encoders and the inertial sensor
-  double Error = LocalDistance - Encoder->position();
+  for(auto distance = LocalList.begin() + currentIndex; distance != LocalList.end(); distance++ )
+  {
+    if (GetSign(distance->first) != FirstDistanceSign) {
+      break;
+    }
+    DistanceUntilSignChange += distance->first;
+  }
+
+  double SmallError = LocalList[currentIndex].first - (Encoder->position() - DrivePos);
+  double Error = DistanceUntilSignChange - Encoder->position();
   double TurnError = wrapAngleDeg(localTurnDistance - robot.Inertial.heading(degrees));
   double LastTurnError;
   double OutputSpeed = 0;
@@ -75,8 +82,10 @@ int _Drive_With_Angles_And_Speed_()
 
   bool resetTurn = false;
 
+  double startTime = Brain.Timer.value();
+
   //main loop
-  while (NotDone || TurnNotDone) 
+  while (((NotDone && (Brain.Timer.value() - startTime < LocalTimeout && currentIndex < LocalList.size())) || TurnNotDone) && !(Brain.Timer.value() - startTime > LocalTimeout)) 
   {
     //record current time for delta time calculation
     LastTime = ThisTime;
@@ -97,7 +106,7 @@ int _Drive_With_Angles_And_Speed_()
     wait(50, msec);
     
     //calculate horizontal and heading error
-    Error = LocalDistance - Encoder->position();
+    Error = DistanceUntilSignChange - Encoder->position();
 
     SmallError = LocalList[currentIndex].first - (Encoder->position() - DrivePos);
     LastTurnError = TurnError;
@@ -107,19 +116,57 @@ int _Drive_With_Angles_And_Speed_()
       LocalTurnPID = BackupTurnPID;
       TurnNotDone = true;
       resetTurn = true;
+      LocalTurnPID.Time = Brain.Timer.value() - startTime;
     }
 
-
-    if((GetSign(LocalList[currentIndex].first) == 1) ? (SmallError <= 0) : (SmallError >= 0))
+    if((LocalList[currentIndex].first > 0) ? (SmallError <= 0) : (SmallError >= 0))
     {
       if(currentIndex + 1 < LocalList.size()){
+        LastFirstDistanceSign = FirstDistanceSign;
+
         currentIndex ++;
         DrivePos = Encoder->position();
         LocalPID.SpeedCap = LocalList[currentIndex].second.second / 100.0 * 12.0;
+
+        //Allow Direction Switches
+        FirstDistanceSign = GetSign(LocalList[currentIndex].first);
+
+        //Check the lenght of the list to avoid a memory permission error
+        if(LocalList.size() > 1){
+          //If the sign has changed since the last distance
+          if(GetSign(LocalList[currentIndex].first) != GetSign(LocalList[currentIndex - 1].first)){
+
+            std::cout<<"accumulating distance again"<<std::endl;
+            for(auto distance = LocalList.begin() + currentIndex; distance != LocalList.end(); distance++ )
+            {
+              if (GetSign(distance->first) != FirstDistanceSign) {
+                break;
+              }
+              DistanceUntilSignChange += distance->first;
+            }
+          }
+        }
+       
+        
+
+        if(LastFirstDistanceSign != FirstDistanceSign){
+          LocalPID = BackupLocalPID;
+          LocalPID.Time = Brain.Timer.value() - startTime;
+          NotDone = true;
+        }
+        
+        if (currentIndex + 1 == LocalList.size()){
+          LocalTurnPID = BackupTurnPID;
+          LocalTurnPID.Time = Brain.Timer.value() - startTime;
+          LocalTurnPID.HasRampedUp = false;
+          LocalTurnPID.HasRampedUp = false;
+          LocalTurnPID.NotDone = &TurnNotDone;
+        }
+
       }
       else
       {
-        //wait until done
+
       }
     }
   }
