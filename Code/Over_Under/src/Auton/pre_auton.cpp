@@ -174,7 +174,7 @@ void pre_auton(void) {
 		}, "Close side for winpoint (safe)."
 	});
 
-	ms.Assign("Match", "Right", "Winpoint", new auton {
+	ms.Assign("Match", "Right", "Simple", new auton {
 		[](){
 			double st = Brain.Timer.value();
 			robot.Inertial.setHeading(-106.8, deg);
@@ -232,9 +232,107 @@ void pre_auton(void) {
 
 			std::cout << "That took " << Brain.Timer.value() - st << " seconds! (:" << std::endl;
 		},
-		"Far side rush for winpoint."
+		"Far side rush for winpoint. (4- ball)"
 	});
 
+	ms.Assign("Match", "Right", "Complex", new auton {
+		[](){
+			double st = Brain.Timer.value();
+			robot.Inertial.setHeading(-106.8, deg);
+			robot.Intake.setVelocity(60, pct);
+
+			robot.RightWing.set(true);
+
+			DriveWithAnglesAndSpeed({
+				{48.5, {-110, 100}}
+			}, 100, false, false, 1.8);
+
+			wait(0.5, sec);
+			robot.RightWing.set(false);
+			waitUntil(PIDsRunning == 0);
+
+			TurnAt(0, 100, true, false, 0.7);
+			robot.Intake.setVelocity(-100, pct);
+			wait(0.4, sec);
+			TurnAt(202, 100, true, false, 1);
+
+			robot.Intake.setVelocity(60, pct);
+			DriveWithAngle(15, 202, 100, true, false, 0.9);
+			TurnAt(0, 100, true, false, 0.8);
+			DriveWithAngle(15, 0, 100, false, false, 0.9);
+			robot.Intake.setVelocity(-100, pct);
+			waitUntil(PIDsRunning == 0);
+			TurnAt(142, 100, true, false, 0.9);
+			DriveWithAngle(24, 142, 100, false, false, 1.1);
+			robot.Intake.setVelocity(60, pct);
+			waitUntil(PIDsRunning == 0);
+
+			DriveWithAngle(-18, 0, 100, true, false, 1.1);
+
+			robot.Intake.setVelocity(-100, pct);
+
+			robot.Intake.setVelocity(-100, pct);
+			ToggleBothWings();
+			wait(0.2, sec);
+			DriveWithAngle(35, 0, 100, true, false, 1);
+			ToggleBothWings();
+
+			DriveWithAnglesAndSpeed({
+				{-1, {0, 100}},
+				{-3, {85, 50}}
+			}, 100, true, false, 1);
+			DriveWithAnglesAndSpeed({
+				{15, {85, 100}},
+				{6, {70, 50}},
+				{6, {70, 100}},
+				{48, {-45, 100}},
+				{24, {-90, 100}}
+			}, 100, false, false, 2.5);
+
+			wait(1.25, sec);
+			robot.RightBackWing.set(true);
+
+			waitUntil(PIDsRunning == 0);
+			robot.RightBackWing.set(false);
+			DriveWithAngle(-1000, -60, 100, true, false, 10);
+			
+
+			std::cout << "That took " << Brain.Timer.value() - st << " seconds! (:" << std::endl;
+		},
+		"Far side rush 5-ball."
+	});
+
+	ms.Assign("Match", "Right", "Winpoint", new auton {
+		[](){
+			double st = Brain.Timer.value();
+			robot.Inertial.setHeading(-180, deg);
+
+			robot.Intake.setVelocity(100, pct);
+			wait(0.5, sec);
+			DriveWithAngle(5, 180, 100, true, false, 0.6);
+
+			DriveWithAnglesAndSpeed({
+				{-12, {180, 100}},
+				{-22, {135, 100}},
+				{-35, {90, 100}}
+			}, 100, false, false, 2);
+
+			wait(0.5, sec);
+			robot.LeftBackWing.set(true);
+			waitUntil(PIDsRunning == 0);
+
+			robot.LeftBackWing.set(false);
+			DriveWithAngle(4, 90, 100, true, false, 0.5);
+
+			turnRight = true;
+			TurnAt(-90, 100, true, false, 0.8);
+			turnRight = false;
+			
+			resetWings = false;
+			std::cout << "That took " << Brain.Timer.value() - st << " seconds! (:" << std::endl;
+		},
+		"Far side 4-ball winpoint (plus touch)."
+	});
 	
 	ms.SetTestAutonomous("Match", "Right", "Winpoint");
 

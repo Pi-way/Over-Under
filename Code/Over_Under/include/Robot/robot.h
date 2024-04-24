@@ -120,6 +120,7 @@ extern double main_wing_open_delay;
 
 extern bool right_wing_open;
 extern bool left_wing_open;
+extern bool turnRight;
 
 void ToggleBothWings();
 void ToggleRightWing();

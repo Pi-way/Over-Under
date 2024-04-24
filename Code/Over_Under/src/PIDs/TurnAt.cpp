@@ -9,8 +9,9 @@
 
 #include <vex.h>
 
-PID TurnPID(1.3 * 0.5, 0.001, 0.01, 200, 10, 6, 0, nullptr, 0, 0);
+PID TurnPID(0.275, 0.1, 0.025, 75, 5, 6, 12, nullptr, 0, 0);
 bool sa100 = false;
+bool turnRight = false;
 
 int _Turn_At_()
 {
@@ -37,7 +38,7 @@ int _Turn_At_()
   RightDrive(setStopping((LocalCoast) ? coast : brake);)
   LeftDrive(setStopping((LocalCoast) ? coast : brake);)
 
-  double Error = wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
+  double Error = turnRight ? LocalDistance - robot.Inertial.heading(degrees) : wrapAngleDeg(LocalDistance - robot.Inertial.heading(degrees));
   double OutputSpeed = 0;
 
   double ThisTime = Brain.Timer.systemHighResolution();
