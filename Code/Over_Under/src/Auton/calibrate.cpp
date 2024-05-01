@@ -6,7 +6,6 @@ int Calibrate(bool inert)
 {
     if(inert){
         robot.Inertial.calibrate();
-        robot.LiftInertial.calibrate();
     }
 
     robot.BL.spin(fwd);
@@ -16,8 +15,6 @@ int Calibrate(bool inert)
     robot.BBL.spin(fwd);
     robot.BBR.spin(fwd);
     robot.Intake.spin(fwd);
-    robot.BigElevate.spin(fwd);
-    robot.SmallElevate.spin(fwd);
 
     robot.BL.setBrake(coast);
     robot.BR.setBrake(coast);
@@ -26,8 +23,6 @@ int Calibrate(bool inert)
     robot.BBL.setBrake(coast);
     robot.BBR.setBrake(coast);
     robot.Intake.setBrake(coast);
-    robot.BigElevate.setBrake(hold);
-    robot.SmallElevate.setBrake(hold);
 
     robot.BL.setVelocity(0, pct);
     robot.BR.setVelocity(0, pct);
@@ -36,8 +31,6 @@ int Calibrate(bool inert)
     robot.BBL.setVelocity(0, pct);
     robot.BBR.setVelocity(0, pct);
     robot.Intake.setVelocity(0, pct);
-    robot.BigElevate.setVelocity(0, pct);
-    robot.SmallElevate.setVelocity(0, pct);
 
     robot.Cata.spin(forward);
     robot.Cata.setBrake(coast);
@@ -50,7 +43,7 @@ int Calibrate(bool inert)
         robot.LeftBackWing.set(false);
     }
 
-    robot.LiftRatchet.set(false);
+    robot.lift.calibrate();
 
     return 0;
 };

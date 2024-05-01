@@ -1,119 +1,19 @@
 #include "vex.h"
 using namespace vex;
 
-int TimersRunning = 0;
-bool DISABLED = false;
-void StartTimer(){
-  auto timer_task = task([]()->int{
-    double startTime = Brain.Timer.value();
-    int time = 0;
-    while(time < 60){//TimersRunning < 2 && time < 60){
-      time = Brain.Timer.value() - startTime;
-      clearConsole();
-      std::cout << std::ceil(60.0 - (Brain.Timer.value() - startTime)) << std::endl;
-      std::cout << " " << std::endl;
-      wait(150, msec);
-    }
-    if (time >= 60){
-      DISABLED = true;
-    }
-    Controller.rumble(".-.-.-");
-    return 0;
-  });
-}
-
-double CatapultSpeed = 100;
-bool RunCata = false;
-void ToggleCatapult(){
-  RunCata = !RunCata;
-  robot.Cata.spin(fwd);
-  if (RunCata) {
-    robot.Cata.setVelocity(CatapultSpeed, pct);
-    if (ms.GetAlliance() == AllianceEnum::Skills){
-      StartTimer();
-    } 
-  } else {
-    robot.Cata.setVelocity(0, pct);
-  }
-}
-
-void SetLiftForCTier(){
-
-  robot.BigElevate.setVelocity(-100, pct);
-  robot.SmallElevate.setVelocity(-100, pct);
-  robot.LiftRatchet.set(true);
-  wait(0.1, sec);
-
-  orientationType axis;
-  double c_tier_position = 30;
-  double last_error;
-  double vel;
-
-  if(std::abs(robot.LiftInertial.orientation(orientationType::pitch, deg)) > std::abs(robot.LiftInertial.orientation(orientationType::roll, deg))){
-    axis = orientationType::pitch;
-  } else {
-    axis = orientationType::roll;
-  }
-
-  double error = wrapAngleDeg(c_tier_position - robot.LiftInertial.orientation(axis, deg));
-
-  while (true) {
-
-    last_error = error;
-    error = wrapAngleDeg(c_tier_position - robot.LiftInertial.orientation(axis, deg));
-    vel = error * 20;
-    robot.BigElevate.setVelocity(vel, pct);
-    robot.SmallElevate.setVelocity(vel, pct);
-
-    if (GetSign(error) != GetSign(last_error)) {
-      robot.BigElevate.setVelocity(0, pct);
-      robot.SmallElevate.setVelocity(0, pct);
-      return;
-    }
-    wait(20, msec);
-  }
-}
-        
+double CatapultSpeed = 50;
 
 void LiftTask(){
   task Task = task([]()->int{
-
-    robot.BigElevate.setStopping(hold);
-    robot.SmallElevate.setStopping(hold);
-    
-    while (true) {
-      if (Controller.ButtonUp.pressing()) {
-
-        robot.BigElevate.setVelocity(-100, pct);
-        robot.SmallElevate.setVelocity(-100, pct);
-        robot.LiftRatchet.set(true);
-        wait(0.1, sec);
-        robot.BigElevate.setVelocity(100, pct);
-        robot.SmallElevate.setVelocity(100, pct);
-        waitUntil(!Controller.ButtonUp.pressing());
-
-      } else if (Controller.ButtonDown.pressing()) {
-          
-        robot.LiftRatchet.set(false);
-        robot.BigElevate.setVelocity(-100, pct);
-        robot.SmallElevate.setVelocity(-100, pct);
-
-      } else if (Controller.ButtonX.pressing()) {
-
-        SetLiftForCTier();
-
-      } else {
-
-        robot.LiftRatchet.set(false);
-        robot.BigElevate.setVelocity(0, pct);
-        robot.SmallElevate.setVelocity(0, pct);
-
-      }
+    while (true)
+    {
       wait(20, msec);
-    }
-    return 0;
+      robot.lift.updateFromDriverCommands();
+    }  
   });
 }
+
+bool AdjustPuncherPosition = true;
 
 void usercontrol(void) {
 
@@ -123,8 +23,36 @@ void usercontrol(void) {
 
   // Auto Driver Control Code
   if (ms.GetAlliance() == AllianceEnum::Skills){
-      StartTimer();
-      clearConsole();
+    robot.Inertial.setHeading(45, deg);
+
+    robot.Intake.setVelocity(100, pct);
+
+    DriveWithAnglesAndSpeed({
+      {-6, {45,  100}},
+      {-6, {90, 50}},
+      {-30, {90, 100}}
+    }, 100, true, false, 1.5);
+
+    robot.Intake.setVelocity(0, pct);
+
+    DriveWithAnglesAndSpeed({
+      {6, {45, 100}},
+      {18, {169, 25}}
+    }, 100, false, false, 2);
+
+    robot.LeftWing.set(true);
+
+    auto tsktsk = vex::task([]()->int{
+      robot.lift.setPuncherPosition(&AdjustPuncherPosition);
+      return 0;
+    });
+    
+    wait(0.5, sec);
+    robot.LaunchCatapultFor(48);
+    AdjustPuncherPosition = false;
+
+    robot.LeftWing.set(false);
+
   }
 
   robot.Cata.setBrake(coast); 
@@ -150,7 +78,7 @@ void usercontrol(void) {
 
   LiftTask();
 
-  while (true && !DISABLED) {
+  while (true) {
 
     target_right_vel = Controller.Axis2.position();
     target_left_vel = Controller.Axis3.position();

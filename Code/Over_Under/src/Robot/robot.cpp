@@ -1,6 +1,118 @@
 #include "vex.h"
 using namespace vex;
 
+Lift::Lift() {
+  this->calibrate();
+}
+
+void Lift::setVelocity(double vel) {
+  this->BigElevate.spin(fwd);
+  this->BigElevate.setVelocity(vel, pct);
+  this->SmallElevate.spin(fwd);
+  this->SmallElevate.setVelocity(vel, pct);
+}
+
+void Lift::calibrate() {
+  this->setVelocity(0);
+  this->BigElevate.setStopping(hold);
+  this->SmallElevate.setStopping(hold);
+  this->BigElevate.spin(fwd);
+  this->SmallElevate.spin(fwd);
+}
+
+void Lift::updateFromDriverCommands(){
+
+  if (Controller.ButtonUp.pressing()) {
+    this->setVelocity(-100);
+    this->LiftRatchet.set(true);
+    wait(0.1, sec);
+    this->setVelocity(100);
+    waitUntil(!Controller.ButtonUp.pressing());
+  } else if (Controller.ButtonDown.pressing()) {
+    this->LiftRatchet.set(false);
+    this->setVelocity(-100);
+  } else if (Controller.ButtonX.pressing()) {
+    this->setCTierPosition();
+  } else {
+    this->LiftRatchet.set(false);
+    this->setVelocity(0);
+  } 
+  
+  if (wrapAngleDeg(this->LiftRotation.angle(deg)) < 10){
+    this->BigElevate.setStopping(coast);
+    this->SmallElevate.setStopping(coast);
+  } else {
+    this->BigElevate.setStopping(hold);
+    this->SmallElevate.setStopping(hold);
+  }
+  std::cout << this->LiftRotation.angle(deg) << std::endl;
+
+}
+
+void Lift::setCTierPosition(){
+
+  bool NotDone = true;
+  PID LiftPID = PID(7, 1, 0.25, 10000, 10, 5, 100, &NotDone, 2, 0.125);
+
+  double thisTime = Brain.Timer.value();
+  double lastTime = thisTime;
+
+  double velocity = 0;
+  double error = 0;
+
+  this->setVelocity(-100);
+  this->LiftRatchet.set(true);
+  wait(0.1, sec);
+
+  while (NotDone) {
+
+    lastTime = thisTime;
+    thisTime = Brain.Timer.value();
+
+    error = -wrapAngleDeg(this->LiftRotation.angle(deg) - this->CTierLiftPosition);
+
+    velocity = LiftPID.Update(error, thisTime - lastTime);
+    this->setVelocity(velocity);
+
+    wait(20, msec);
+  }
+
+  this->setVelocity(0);
+}
+
+void Lift::setPuncherPosition(bool *NotDone){
+  
+  bool unusedBool = true;
+  PID LiftPID = PID(7, 1, 0.25, 10000, 10, 5, 100, &unusedBool, 2, 0.125);
+
+  double thisTime = Brain.Timer.value();
+  double lastTime = thisTime;
+
+  double velocity = 0;
+  double error = 0;
+
+  this->setVelocity(-100);
+  this->LiftRatchet.set(true);
+  wait(0.1, sec);
+
+  while (*NotDone) {
+
+    lastTime = thisTime;
+    thisTime = Brain.Timer.value();
+
+    error = -wrapAngleDeg(this->LiftRotation.angle(deg) - this->PuncherLiftPosition);
+
+    std::cout << velocity << std::endl;
+
+    velocity = LiftPID.Update(error, thisTime - lastTime);
+    this->setVelocity(velocity);
+
+    wait(20, msec);
+  }
+
+  this->setVelocity(0);
+}
+
 Robot::Robot() {
 }
 

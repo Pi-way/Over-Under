@@ -12,6 +12,31 @@ extern std::vector<vex::device> PortWatch;
 
 int32_t WatchPort(int32_t port);
 
+class Lift{
+public:
+
+  motor BigElevate = motor(WatchPort(PORT11), ratio36_1, false);
+  motor SmallElevate = motor(WatchPort(PORT18), ratio18_1, false);
+
+  rotation LiftRotation = rotation(WatchPort(PORT12), false);
+  digital_out LiftRatchet = digital_out(Brain.ThreeWirePort.B);
+
+  Lift();
+  void calibrate();
+
+  double CTierLiftPosition = 73; //Degrees
+  double PuncherLiftPosition = 28; //Degrees
+
+  void setVelocity(double vel);
+
+  void updateFromDriverCommands();
+  void setCTierPosition();
+  void setPuncherPosition(bool *NotDone);
+
+};
+
+extern bool sa100;
+
 class Robot{
 public:
 
@@ -44,10 +69,7 @@ public:
   digital_out RightBackWing = digital_out(Brain.ThreeWirePort.F);
   digital_out LeftBackWing = digital_out(Brain.ThreeWirePort.G);
 
-  digital_out LiftRatchet = digital_out(Brain.ThreeWirePort.B);
-  inertial LiftInertial = inertial(WatchPort(PORT12));
-  motor BigElevate = motor(WatchPort(PORT11), ratio36_1, false);
-  motor SmallElevate = motor(WatchPort(PORT18), ratio18_1, false);
+  Lift lift = Lift();
 
 };
 
@@ -104,6 +126,7 @@ extern double CustomTimeout;
 extern double SettleTime;
 extern bool *FalsePtr;
 extern bool *NeverStopPtr;
+extern bool AdjustPuncherPosition;
 extern int PIDsRunning;
 extern double TurnDistance;
 extern vex::task PIDTask;
